@@ -1,0 +1,14 @@
+version: "3"
+services:
+  web:
+    build: .
+    environment:
+      - VEEDRIVE_MEDIA_PATH=/app/tests/sandbox_folder
+    ports:
+      - "4444:4444"
+    volumes:
+      - .:/app
+#    depends_on:
+#      - mongo
+#  mongo:
+#    image: "mongo:latest"
