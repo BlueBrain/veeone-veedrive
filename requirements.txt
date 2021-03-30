@@ -1,0 +1,12 @@
+aiohttp~=3.7.4.post0
+aiounittest~=1.4.0
+imageio~=2.9.0
+motor~=2.3.1
+numpy~=1.20.1
+opencv-python~=4.5.1.48
+pymongo~=3.11.3
+pytz~=2021.1
+requests~=2.25.1
+websockets~=8.1
+scandir~=1.10.0
+setuptools~=54.1.1
