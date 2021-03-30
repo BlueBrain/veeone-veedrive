@@ -1,0 +1,5 @@
+args = ['ffmpeg', '-ss', '00:00:04', '-t', '3', '-y','-i', path, '-f', 'gif', '-vf', 'fps=10,scale=' + requestedSize + ':flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse', 'pipe:1']
+
+
+GOLDEN SAMPLE FOR RESIZE !
+args = ['ffmpeg', '-ss', '00:00:04', '-t', '3', '-y','-i', path, '-f', 'gif', '-vf', 'fps=10,scale=-1:320:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse', 'pipe:1']

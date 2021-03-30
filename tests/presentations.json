@@ -1,0 +1,77 @@
+[
+    {
+        "name": "scene1",
+        "theme" : "default",
+        "topics": [
+            {
+                "name": "topic1",
+                "windows": [
+                    {
+                        "source": "http://url",
+                        "dimensions": [
+                            200,
+                            300
+                        ],
+                        "size": [
+                            200,
+                            300
+                        ],
+                        "selected": true,
+                        "aspect": 0.667,
+                        "mode": 1
+                    }
+                ],
+                "layout" : "default"
+            }
+        ]
+    },    {
+        "name": "scene1",
+        "theme" : "default",
+        "topics": [
+            {
+                "name": "topic1",
+                "windows": [
+                    {
+                        "source": "http://url",
+                        "dimensions": [
+                            8000,
+                            8000
+                        ],
+                        "size": [
+                            8000,
+                            8000
+                        ],
+                        "selected": true,
+                        "aspect": 0.667,
+                        "mode": 1
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "scene2",
+        "theme" : "default",
+        "topics": [
+            {
+                "name": "topic1",
+                "windows": [
+                    {
+                        "source": "http://url",
+                        "dimensions": [
+                            1234,
+                            1234
+                        ],
+                        "size": [
+                            1234,
+                            1234
+                        ],
+                        "selected": true,
+                        "aspect": 0.667,
+                        "mode": 1
+                    }
+                ]
+            }
+        ]
+    }
+]
