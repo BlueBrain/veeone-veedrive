@@ -1,6 +1,7 @@
 FROM python:3.8.8 as builder
 
-RUN apt update && apt install libgl1-mesa-glx ffmpeg -y
+RUN apt update && apt install libgl1-mesa-glx ffmpeg ghostscript -y
+COPY ./ImageMagick-6/policy.xml /etc/ImageMagick-6/
 
 WORKDIR /app
 ADD . /app
