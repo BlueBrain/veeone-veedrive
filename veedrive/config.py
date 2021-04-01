@@ -3,11 +3,14 @@ import os
 
 import pytz
 
+DEFAULT_HOST = "0.0.0.0"
+DEFAULT_PORT = 4444
+
 SANDBOX_PATH = os.getenv("VEEDRIVE_MEDIA_PATH", "~/")
 STATIC_CONTENT_URL = os.getenv(
-    "VEEDRIVE_STATIC_CONTENT_URL", "http://localhost:4444/static"
+    "VEEDRIVE_STATIC_CONTENT_URL", f"http://{DEFAULT_HOST}:{DEFAULT_PORT}/static"
 )
-CONTENT_URL = os.getenv("VEEDRIVE_CONTENT_URL", "http://localhost:4444/content")
+CONTENT_URL = os.getenv("VEEDRIVE_CONTENT_URL", f"http://{DEFAULT_HOST}:{DEFAULT_PORT}/content")
 DB_NAME = os.getenv("VEEDRIVE_DB_NAME", "test_database")
 
 if os.getenv("VEEDRIVE_LOG_LEVEL") == "DEBUG":

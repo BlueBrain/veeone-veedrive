@@ -6,7 +6,7 @@ import pymongo
 import testing_server
 import websockets
 
-import veedrive.config as config
+from veedrive import config
 
 
 class Test(aiounittest.AsyncTestCase):
@@ -159,7 +159,7 @@ class Test(aiounittest.AsyncTestCase):
 
     @staticmethod
     async def _send_ws(obj):
-        async with websockets.connect("ws://localhost:4444/ws") as websocket:
+        async with websockets.connect(f"ws://{config.DEFAULT_HOST}:{config.DEFAULT_PORT}/ws") as websocket:
             await websocket.send(json.dumps(obj))
             response = await websocket.recv()
             return json.loads(response)

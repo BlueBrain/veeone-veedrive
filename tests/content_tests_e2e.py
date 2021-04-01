@@ -272,7 +272,7 @@ class Test(aiounittest.AsyncTestCase):
 
     @staticmethod
     async def _send_ws(payload):
-        async with websockets.connect("ws://localhost:4444/ws") as websocket:
+        async with websockets.connect(f"ws://{config.DEFAULT_HOST}:{config.DEFAULT_PORT}/ws") as websocket:
             await websocket.send(json.dumps(payload))
             response = await websocket.recv()
             return json.loads(response)

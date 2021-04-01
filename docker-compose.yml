@@ -8,7 +8,7 @@ services:
       - "4444:4444"
     volumes:
       - .:/app
-#    depends_on:
-#      - mongo
-#  mongo:
-#    image: "mongo:latest"
+    depends_on:
+      - mongo
+  mongo:
+    image: "mongo:latest"

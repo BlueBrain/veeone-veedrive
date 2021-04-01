@@ -1,14 +1,18 @@
-FROM python:3.8.8 as builder
+FROM python:3.8.8-slim as builder
 
-RUN apt update && apt install libgl1-mesa-glx ffmpeg ghostscript -y
-COPY ./ImageMagick-6/policy.xml /etc/ImageMagick-6/
+RUN apt update \
+    && apt install libgl1-mesa-glx ffmpeg ghostscript imagemagick -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY deploy/ImageMagick-6/policy.xml /etc/ImageMagick-6/
 
 WORKDIR /app
 ADD . /app
 
-RUN pip install -r requirements.txt
-RUN pip install -e .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -e .
 
 EXPOSE 4444
 
-CMD python ./tests/content_tests_e2e.py
+ENTRYPOINT ["python"]
