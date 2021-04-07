@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description="websocket proxy application")
 parser.add_argument(
-    "--port", dest="port", type=int, default=4444, help="port to bind to"
+    "--port", dest="port", type=int, default=config.DEFAULT_PORT, help="port to bind to"
 )
 
 parser.add_argument(
@@ -19,7 +19,7 @@ parser.add_argument(
     dest="address",
     type=str,
     help="address to bind to",
-    default="localhost",
+    default=config.DEFAULT_HOST,
 )
 
 args = parser.parse_args()
