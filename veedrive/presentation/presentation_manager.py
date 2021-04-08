@@ -11,7 +11,7 @@ from ..utils.exceptions import CodeException
 
 logger = logging.getLogger(__name__)
 
-mongo_client = motor.motor_asyncio.AsyncIOMotorClient()
+mongo_client = motor.motor_asyncio.AsyncIOMotorClient(config.DB_HOST, config.DB_PORT)
 db = mongo_client[config.DB_NAME]
 archive_collection = db.scene_collection_archive
 scene_collection = db.scene_collection

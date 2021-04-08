@@ -10,11 +10,14 @@ precommit:
 venv:
 	virtualenv -p `which python3` venv
 
+run-docker-tests:
+	docker-compose build
+	docker-compose  run --rm web -m pytest
+	docker-compose stop
+
 install-dev:
 	pip install -e .
 
-functional-tests:
-	$(foreach file, $(wildcard tests/*e2e*), python $(file) || exit ;)
 
 clean-pyc:
 	find -name '*.pyc' -exec rm --force {} +
