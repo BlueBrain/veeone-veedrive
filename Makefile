@@ -18,10 +18,12 @@ run-docker-tests:
 install-dev:
 	pip install -e .
 
-
 clean-pyc:
 	find -name '*.pyc' -exec rm --force {} +
 	find -name '*.pyo' -exec rm --force {} +
 
 docs:
 	cd docs; sphinx-apidoc  -o . .. ; make html
+
+coverage:
+	coverage run   -m pytest && coverage report

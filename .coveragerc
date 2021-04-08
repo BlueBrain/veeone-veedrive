@@ -1,0 +1,6 @@
+[run]
+source=veedrive
+
+[report]
+fail_under=20
+skip_empty=true
