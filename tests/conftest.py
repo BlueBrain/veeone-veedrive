@@ -1,5 +1,6 @@
 import json
 import os
+import signal
 import subprocess
 import time
 
@@ -36,7 +37,8 @@ def start_server(verbose=False):
 
 
 def kill_server():
-    server.terminate()
+    server.send_signal(signal.SIGINT)
+    server.wait()
     FNULL.close()
 
 
