@@ -12,7 +12,7 @@ venv:
 
 run-docker-tests:
 	docker-compose build
-	docker-compose  run --rm web -m pytest
+	docker-compose run --rm web -m pytest --cov=veedrive -s -v
 	docker-compose stop
 
 install-dev:
@@ -26,4 +26,5 @@ docs:
 	cd docs; sphinx-apidoc  -o . .. ; make html
 
 coverage:
-	coverage run   -m pytest && coverage report
+	python -m pytest --cov=veedrive
+
