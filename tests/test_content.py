@@ -24,7 +24,7 @@ async def test_request_image(testing_backend):
         "method": "RequestImage",
         "id": "2",
         "params": {
-            "path": "chess.jpg",
+            "path": "folder1/folder2/chess.jpg",
             "clientSize": {"width": 500, "height": 100},
         },
     }
@@ -32,12 +32,11 @@ async def test_request_image(testing_backend):
     result = response["result"]
     # Check for extended keys
     assert response["id"] == "2"
-    assert result["thumbnail"] == f"{config.CONTENT_URL}/thumb/chess.jpg"
+    assert result["thumbnail"] == f"{config.CONTENT_URL}/thumb/folder1/folder2/chess.jpg"
     assert (
-        result["scaled"]
-        == f"{config.CONTENT_URL}/scaled/chess.jpg?width=500&height=100"
+        result["scaled"] == f"{config.CONTENT_URL}/scaled/folder1/folder2/chess.jpg?width=500&height=100"
     )
-    assert result["url"] == f"{config.STATIC_CONTENT_URL}/chess.jpg"
+    assert result["url"] == f"{config.STATIC_CONTENT_URL}/folder1/folder2/chess.jpg"
     assert isinstance(result["size"], int)
 
     # Check if content is served
