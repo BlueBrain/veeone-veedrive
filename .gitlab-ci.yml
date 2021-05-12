@@ -1,0 +1,31 @@
+include:
+  - project: viz/ci/gitlabpipelines
+    ref: develop
+    file: common.yml
+
+stages:
+  - test
+  - docker-build
+
+build-and-test-default:
+  stage: test
+  extends: .python-pytest
+  variables:
+    PYTEST_ARGS: tests/test_content.py -s -v
+    PYTEST_COVERAGE_ARGS: --cov=veedrive -s
+    APT_PACKAGES: libgl1-mesa-glx ffmpeg ghostscript imagemagick
+    VEEDRIVE_LOG_LEVEL: DEBUG
+  before_script:
+    - cp deploy/ImageMagick-6/policy.xml /etc/ImageMagick-6/
+    - export VEEDRIVE_MEDIA_PATH=`pwd`/tests/sandbox_folder
+    - echo $VEEDRIVE_MEDIA_PATH
+  only:
+    - merge_requests
+
+build-docker-image-for-running-tests:
+  stage: docker-build
+  extends: .build-image-using-kaniko
+  variables:
+    PUSH_IMAGE: "false"
+  only:
+    - merge_requests

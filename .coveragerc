@@ -2,5 +2,5 @@
 source=veedrive
 
 [report]
-fail_under=80
+fail_under=60
 skip_empty=true
