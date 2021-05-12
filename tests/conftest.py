@@ -13,7 +13,7 @@ FNULL = open(os.devnull, "w")
 server = None
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def testing_backend(request):
     start_server(verbose=True)
 
