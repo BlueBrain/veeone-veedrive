@@ -3,12 +3,7 @@ include:
     ref: develop
     file: common.yml
 
-stages:
-  - test
-  - docker-build
-
 build-and-test-default:
-  stage: test
   extends: .python-pytest
   variables:
     PYTEST_ARGS: tests/test_content.py -s -v
@@ -19,13 +14,11 @@ build-and-test-default:
     - cp deploy/ImageMagick-6/policy.xml /etc/ImageMagick-6/
     - export VEEDRIVE_MEDIA_PATH=`pwd`/tests/sandbox_folder
     - echo $VEEDRIVE_MEDIA_PATH
-  only:
-    - merge_requests
 
-build-docker-image-for-running-tests:
-  stage: docker-build
+build-docker-image:
   extends: .build-image-using-kaniko
+
+publish-docker-image:
+  extends: .publish-image-using-kaniko
   variables:
-    PUSH_IMAGE: "false"
-  only:
-    - merge_requests
+    CI_REGISTRY_IMAGE: $CI_REGISTRY/bbp-ou-visualization/veedrive
