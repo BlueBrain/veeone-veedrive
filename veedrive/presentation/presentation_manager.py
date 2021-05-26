@@ -19,15 +19,12 @@ scene_collection = db.scene_collection
 
 async def get_scene(name):
     try:
-        found = await scene_collection.find_one({"name": name})
-        if found:
-            return found
-        else:
-            raise CodeException(0, "presentation not found")
+        return await _find_scene(name)
     except CodeException:
         raise
+    # TODO REMOVE?
     except Exception as e:
-        raise CodeException(3, f"execution error: {e}")
+        raise CodeException(config.SCENE_DB_ISSUE, f"execution error: {e}")
 
 
 async def get_scene_versions(name):
@@ -38,8 +35,9 @@ async def get_scene_versions(name):
         for scene in await cursor.to_list(length=100):
             scenes.append(scene)
         return scenes
+    # TODO REMOVE?
     except Exception as e:
-        raise CodeException(3, f"execution error: {e}")
+        raise CodeException(config.SCENE_DB_ISSUE, f"execution error: {e}")
 
 
 async def get_scenes():
@@ -49,37 +47,41 @@ async def get_scenes():
         for scene in await cursor.to_list(length=100):
             scenes.append(scene)
         return scenes
+    # TODO REMOVE?
     except Exception as e:
-        raise CodeException(3, f"execution error: {e}")
+        raise CodeException(config.SCENE_DB_ISSUE, f"execution error: {e}")
 
 
 async def save_scene(scene):
     try:
-        found = await scene_collection.find_one({"name": scene.name})
-        if found:
-            await _archive_scene(found)
-            # TODO rather update ?
-            await scene_collection.delete_one(found)
+        found = await _find_scene(scene.name)
+        await _archive_scene(found)
+        # TODO rather update ?
+        await scene_collection.delete_one(found)
+    except CodeException as e:
+        if e.code == config.SCENE_NOT_FOUND:
+            pass
+    finally:
         await scene_collection.insert_one(json.loads(scene.serialize()))
-
-    except CodeException:
-        raise
-    except Exception as e:
-        raise CodeException(3, f"execution error: {e}")
 
 
 async def delete_scene(name):
     try:
-        found = await scene_collection.find_one({"name": name})
-        if found:
-            _archive_scene(found)
-            await scene_collection.delete_one(found)
-        else:
-            raise CodeException(0, "presentation not found")
+        found = await _find_scene(name)
+        await scene_collection.delete_one(found)
     except CodeException:
         raise
+    # TODO REMOVE?
     except Exception as e:
-        raise CodeException(3, f"execution error: {e}")
+        raise CodeException(config.SCENE_DB_ISSUE, f"execution error: {e}")
+
+
+async def _find_scene(name):
+    found = await scene_collection.find_one({"name": name})
+    if found:
+        return found
+    else:
+        raise CodeException(config.SCENE_NOT_FOUND, "presentation not found")
 
 
 async def _archive_scene(scene):

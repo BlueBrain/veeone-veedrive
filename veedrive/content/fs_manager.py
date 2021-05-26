@@ -4,7 +4,7 @@ import re
 import scandir
 
 from .. import config
-from ..utils.exceptions import CodeException
+from ..utils.exceptions import WrongObjectType
 
 
 def list_directory(path):
@@ -60,14 +60,16 @@ def sarch_file_system(name):
 
 def validate_path(absolute_path, required_type="file"):
     if config.SANDBOX_PATH not in os.path.abspath(absolute_path):
-        raise CodeException(11, "Path not in configured sandbox")
+        raise PermissionError("Path not in configured sandbox")
     if not os.path.exists(absolute_path):
-        raise CodeException(0, "Not found")
+        raise FileNotFoundError("Not found")
     if not os.access(absolute_path, os.R_OK):
-        raise CodeException(2, "Permission denied")
+        raise PermissionError("Permission denied")
     if required_type == "file":
         if not os.path.isfile(absolute_path):
-            raise CodeException(1, "Not a file")
-    if required_type == "dir":
+            raise WrongObjectType("Not a file")
+    elif required_type == "dir":
         if not os.path.isdir(absolute_path):
-            raise CodeException(1, "Not a directory")
+            raise WrongObjectType("Not a directory")
+    else:
+        raise WrongObjectType()

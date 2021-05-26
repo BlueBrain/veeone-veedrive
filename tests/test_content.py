@@ -124,11 +124,11 @@ async def test_request_image_error(testing_backend):
         "params": {"path": "chess_dont_exist.jpg"},
     }
     response = await testing_backend.send_ws(payload)
-    assert response["error"]["code"] == 0
+    assert response["error"]["code"] == config.PATH_NOT_FOUND
 
     payload = {"method": "RequestImage", "id": "1", "params": {"path": "folder1"}}
     response = await testing_backend.send_ws(payload)
-    assert response["error"]["code"] == 1
+    assert response["error"]["code"] == config.WRONG_FILE_TYPE_REQUESTED
     payload = {
         "method": "RequestImage",
         "id": "1",
@@ -136,8 +136,9 @@ async def test_request_image_error(testing_backend):
     }
     response = await testing_backend.send_ws(payload)
     # TODO: Rework error codes
-    print("---------", response)
-    assert response["error"]["code"] == 11
+    assert response["error"]["code"] == config.PERMISSION_DENIED
+    assert response["error"]["message"] == "Path not in configured sandbox"
+
 
 
 @pytest.mark.asyncio
@@ -243,7 +244,7 @@ async def test_list_directory(testing_backend):
     }
     response = await testing_backend.send_ws(payload)
     # TODO: Rework error codes
-    # assert response["error"]["code"] == 2  # not a directory
+    assert response["error"]["code"] == config.WRONG_FILE_TYPE_REQUESTED
 
     payload = {
         "method": "ListDirectory",
@@ -251,7 +252,7 @@ async def test_list_directory(testing_backend):
         "params": {"path": "./NOT_EXISTING"},
     }
     response = await testing_backend.send_ws(payload)
-    assert response["error"]["code"] == 0  # not found
+    assert response["error"]["code"] == config.PATH_NOT_FOUND
 
     payload = {"method": "ListDirectory", "id": "1", "params": {"path": "./"}}
     response = await testing_backend.send_ws(payload)

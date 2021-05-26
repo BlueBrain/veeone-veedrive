@@ -11,7 +11,7 @@ from .content import content_manager
 from .content import ws_handlers as content_handler
 from .presentation import ws_handlers as presentation_handler
 from .utils import jsonrpc
-from .utils.exceptions import CodeException
+from .utils.exceptions import CodeException, WrongObjectType
 
 logging.basicConfig(level=config.logger_level)
 logger = logging.getLogger(__name__)
@@ -35,10 +35,16 @@ async def handle_ws(request):
                 try:
                     response = await process_request(data)
                 except KeyError as e:
-                    await ws.send_str(str(jsonrpc.prepare_error(data, 4, "Malformed")))
-
-                except Exception as e:
+                    await ws.send_str(str(jsonrpc.prepare_error(data, config.MALFORMED_REQUEST, "Malformed")))
+                except CodeException as e:
                     await ws.send_str(str(jsonrpc.prepare_error_code(data, e)))
+                except PermissionError as e:
+                    await ws.send_str(str(jsonrpc.prepare_error(data, config.PERMISSION_DENIED, str(e))))
+                except FileNotFoundError as e:
+                    await ws.send_str(str(jsonrpc.prepare_error(data, config.PATH_NOT_FOUND, str(e))))
+                except WrongObjectType as e:
+                    await ws.send_str(str(jsonrpc.prepare_error(data, config.WRONG_FILE_TYPE_REQUESTED, str(e))))
+
                 await ws.send_str(str(response))
 
         elif msg.type == aiohttp.WSMsgType.ERROR:
@@ -93,11 +99,10 @@ async def handle_thumbnail_request(request):
         except ValueError:
             raise HTTPBadRequest()
         return web.Response(body=data[0], content_type=data[1])
-    except CodeException as e:
-        if e.code == 0:
-            raise HTTPNotFound()
-        if e.code == 11 or e.code == 2:
-            raise HTTPForbidden()
+    except FileNotFoundError as e:
+        raise HTTPNotFound()
+    except PermissionError as e:
+        raise HTTPForbidden()
     except Exception as e:
         logger.error(e)
         raise e
