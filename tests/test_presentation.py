@@ -92,7 +92,7 @@ async def test_2_list_archived_scenes(testing_backend):
     # Test for MALFORMED error
     obj = {"method": "SceneVersions", "id": "1", "params": {"ame": "scene1"}}
     response = await testing_backend.send_ws(obj)
-    assert response["error"]["code"] == 4
+    assert response["error"]["code"] == config.MALFORMED_REQUEST
 
 
 @pytest.mark.asyncio
@@ -121,12 +121,12 @@ async def test_5_delete_scene(testing_backend):
         "params": {"name": "scene1", "clientId": "client_id_123"},
     }
     response = await testing_backend.send_ws(obj)
-    assert response["error"]["code"] == 0
+    assert response["error"]["code"] == config.SCENE_NOT_FOUND
 
     # Test for MALFORMED error
     obj = {"method": "DeleteScene", "id": "1", "params": {"ame": "scene1"}}
     response = await testing_backend.send_ws(obj)
-    assert response["error"]["code"] == 4
+    assert response["error"]["code"] == config.MALFORMED_REQUEST
 
     # Test archive
     obj = {
