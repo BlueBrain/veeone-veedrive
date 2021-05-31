@@ -96,13 +96,13 @@ async def handle_thumbnail_request(request):
             data = await content_manager.get_thumbnail(path, width, height, mode)
         except KeyError:
             data = await content_manager.get_thumbnail(path)
-        except ValueError:
-            raise HTTPBadRequest()
         return web.Response(body=data[0], content_type=data[1])
     except FileNotFoundError as e:
         raise HTTPNotFound()
     except PermissionError as e:
         raise HTTPForbidden()
+    except (ValueError, TypeError):
+        raise HTTPBadRequest()
     except Exception as e:
         logger.error(e)
         raise e

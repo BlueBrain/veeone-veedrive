@@ -31,7 +31,9 @@ async def start_app():
         [
             web.get("/ws", server.handle_ws),
             web.get("/content/thumb/{path:[^{}]+}", server.handle_thumbnail_request),
-            web.get("/content/scaled/{path:[^{}]+}", server.handle_scaled_image_request),
+            web.get(
+                "/content/scaled/{path:[^{}]+}", server.handle_scaled_image_request
+            ),
             web.static("/static", config.SANDBOX_PATH),
         ]
     )

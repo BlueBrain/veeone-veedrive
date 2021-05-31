@@ -22,9 +22,8 @@ def get_image_urls(path, client_size=None):
     """
     response = _create_file_url_response(path)
     if client_size:
-        response[
-            "scaled"
-        ] = f"{config.CONTENT_URL}/scaled/{path}?width={client_size['width']}&height={client_size['height']}"
+        response = _add_scaled_url(response, path, client_size)
+
     return response
 
 
@@ -40,7 +39,7 @@ def get_file_urls(path):
 
 
 async def get_scaled_image(path, client_width, client_height, scaling_mode="fit"):
-    """[summary]
+    """Get a scaled image, fitting or filling client's display
 
     :param path: relative to sandboxpath path of object
     :type path: str
@@ -73,7 +72,7 @@ async def get_scaled_image(path, client_width, client_height, scaling_mode="fit"
 
 
 async def get_thumbnail(path, width=256, height=256, scaling_mode="fit"):
-    """Get a thumbnail of object (image, video, document)
+    """Get a thumbnail of an object (image, video, document)
 
     :param path: relative to sandboxpath path of object
     :type path: str
@@ -93,6 +92,10 @@ async def get_thumbnail(path, width=256, height=256, scaling_mode="fit"):
     validate_path(absolute_path)
 
     file_extension = os.path.splitext(path)[1]
+
+    if file_extension not in config.SUPPORTED_THUMBNAIL_EXTENSIONS:
+        raise TypeError
+
     if file_extension in config.SUPPORTED_IMAGE_EXTENSIONS:
         thumbnail, image_format = await run_async(
             image.resize_image, absolute_path, width, height, scaling_mode, ".jpg"
@@ -113,9 +116,28 @@ async def get_thumbnail(path, width=256, height=256, scaling_mode="fit"):
 def _create_file_url_response(path):
     absolute_path = os.path.join(config.SANDBOX_PATH, path)
     validate_path(absolute_path)
+    ext = os.path.splitext(path)[1]
+    thubmnail_url = (
+        f"{config.CONTENT_URL}/thumb/{path}"
+        if ext in config.SUPPORTED_THUMBNAIL_EXTENSIONS
+        else "null"
+    )
+
     response = {
         "url": f"{config.STATIC_CONTENT_URL}/{path}",
-        "thumbnail": f"{config.CONTENT_URL}/thumb/{path}",
+        "thumbnail": thubmnail_url,
         "size": os.path.getsize(absolute_path),
     }
+    return response
+
+
+def _add_scaled_url(response, path, client_size):
+    ext = os.path.splitext(path)[1]
+    scaled_url = (
+        f"{config.CONTENT_URL}/scaled/{path}?width={client_size['width']}&height={client_size['height']}"
+        if ext in config.SUPPORTED_THUMBNAIL_EXTENSIONS
+        else "null"
+    )
+
+    response["scaled"] = scaled_url
     return response

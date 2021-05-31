@@ -40,7 +40,7 @@ class TestWsHandlers(unittest.TestCase):
         self.sandboxpath = config.SANDBOX_PATH  # '/tests/sandbox_folder/'
 
     def test_create_file_response(self):
-        path = "file1"
+        path = "chess.jpg"
         obj = content_manager._create_file_url_response(path)
         assert obj["url"] == f"{config.STATIC_CONTENT_URL}/{path}"
         assert obj["thumbnail"] == f"{config.CONTENT_URL}/thumb/{path}"

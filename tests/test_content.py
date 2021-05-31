@@ -32,9 +32,12 @@ async def test_request_image(testing_backend):
     result = response["result"]
     # Check for extended keys
     assert response["id"] == "2"
-    assert result["thumbnail"] == f"{config.CONTENT_URL}/thumb/folder1/folder2/chess.jpg"
     assert (
-        result["scaled"] == f"{config.CONTENT_URL}/scaled/folder1/folder2/chess.jpg?width=500&height=100"
+        result["thumbnail"] == f"{config.CONTENT_URL}/thumb/folder1/folder2/chess.jpg"
+    )
+    assert (
+        result["scaled"]
+        == f"{config.CONTENT_URL}/scaled/folder1/folder2/chess.jpg?width=500&height=100"
     )
     assert result["url"] == f"{config.STATIC_CONTENT_URL}/folder1/folder2/chess.jpg"
     assert isinstance(result["size"], int)
@@ -140,7 +143,6 @@ async def test_request_image_error(testing_backend):
     assert response["error"]["message"] == "Path not in configured sandbox"
 
 
-
 @pytest.mark.asyncio
 async def test_request_file(testing_backend):
     payload = {"method": "RequestFile", "id": "1", "params": {"path": "file.pdf"}}
@@ -233,6 +235,27 @@ async def test_get_movie_thumbnail_with_size_constraint(testing_backend):
     assert gif[1].shape == (50, 70, 4)
 
     os.remove(tmp_filename)
+
+
+@pytest.mark.asyncio
+async def test_get_thumbnail_exception(testing_backend):
+    thumbnail_url = await testing_backend.get_thumbnail_url("file1.txt")
+    assert thumbnail_url == "null"
+
+    req = requests.get(f"{config.CONTENT_URL}/thumb/file1.txt")
+    assert req.status_code == HTTPBadRequest.status_code
+
+    payload = {
+        "method": "RequestImage",
+        "id": "2",
+        "params": {
+            "path": "file1.txt",
+            "clientSize": {"width": 500, "height": 100},
+        },
+    }
+    response = await testing_backend.send_ws(payload)
+    result = response["result"]
+    assert result["scaled"] == "null"
 
 
 @pytest.mark.asyncio
