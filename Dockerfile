@@ -16,3 +16,4 @@ RUN pip install --no-cache-dir -e .
 EXPOSE 4444
 
 ENTRYPOINT ["python"]
+CMD ["-m", "veedrive.main"]

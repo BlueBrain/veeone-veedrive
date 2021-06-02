@@ -15,6 +15,10 @@ run-docker-tests:
 	docker-compose run --rm web -m pytest --cov=veedrive -s -v
 	docker-compose stop
 
+run-docker:
+	docker-compose build
+	docker-compose up
+
 install-dev:
 	pip install -e .
 

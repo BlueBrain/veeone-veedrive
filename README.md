@@ -1,5 +1,12 @@
 # VeeDrive
 
+## Running
+
+```
+export VEEDRIVE_HOST_MEDIA_PATH=path_to_media_folder
+make run-docker
+```
+
 ## Running tests with coverage report
 It is the easiest to run tests in a Docker container:
 ``` 

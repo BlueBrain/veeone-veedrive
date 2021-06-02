@@ -3,12 +3,13 @@ services:
   web:
     build: .
     environment:
-      - VEEDRIVE_MEDIA_PATH=/app/tests/sandbox_folder
+      - VEEDRIVE_MEDIA_PATH=/media
       - VEEDRIVE_DB_HOST=mongo
     ports:
       - "4444:4444"
     volumes:
       - .:/app
+      - ${VEEDRIVE_HOST_MEDIA_PATH:-./tests/sandbox_folder/}:/media
     depends_on:
       - mongo
   mongo:
