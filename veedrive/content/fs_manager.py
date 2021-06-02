@@ -4,11 +4,13 @@ import re
 import scandir
 
 from .. import config
-from ..utils.exceptions import WrongObjectType
+from .utils import sanitize_path, validate_path
 
 
+@sanitize_path
 def list_directory(path):
     """
+    List content (files and directories) of a specified directory.
 
     :param path: relative to sandboxpath path of the file
     :type path: str
@@ -56,20 +58,3 @@ def sarch_file_system(name):
     except Exception as e:
         raise
     return {"directories": found_dirs, "files": found_files}
-
-
-def validate_path(absolute_path, required_type="file"):
-    if config.SANDBOX_PATH not in os.path.abspath(absolute_path):
-        raise PermissionError("Path not in configured sandbox")
-    if not os.path.exists(absolute_path):
-        raise FileNotFoundError("Not found")
-    if not os.access(absolute_path, os.R_OK):
-        raise PermissionError("Permission denied")
-    if required_type == "file":
-        if not os.path.isfile(absolute_path):
-            raise WrongObjectType("Not a file")
-    elif required_type == "dir":
-        if not os.path.isdir(absolute_path):
-            raise WrongObjectType("Not a directory")
-    else:
-        raise WrongObjectType()

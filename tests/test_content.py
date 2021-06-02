@@ -32,9 +32,12 @@ async def test_request_image(testing_backend):
     result = response["result"]
     # Check for extended keys
     assert response["id"] == "2"
-    assert result["thumbnail"] == f"{config.CONTENT_URL}/thumb/folder1/folder2/chess.jpg"
     assert (
-        result["scaled"] == f"{config.CONTENT_URL}/scaled/folder1/folder2/chess.jpg?width=500&height=100"
+        result["thumbnail"] == f"{config.CONTENT_URL}/thumb/folder1/folder2/chess.jpg"
+    )
+    assert (
+        result["scaled"]
+        == f"{config.CONTENT_URL}/scaled/folder1/folder2/chess.jpg?width=500&height=100"
     )
     assert result["url"] == f"{config.STATIC_CONTENT_URL}/folder1/folder2/chess.jpg"
     assert isinstance(result["size"], int)
@@ -51,7 +54,7 @@ async def test_get_image(testing_backend):
         "method": "RequestImage",
         "id": "2",
         "params": {
-            "path": "chess.jpg",
+            "path": "/chess.jpg",
             "clientSize": {"width": 500, "height": 100},
         },
     }
@@ -135,10 +138,8 @@ async def test_request_image_error(testing_backend):
         "params": {"path": "../../README.md"},
     }
     response = await testing_backend.send_ws(payload)
-    # TODO: Rework error codes
     assert response["error"]["code"] == config.PERMISSION_DENIED
     assert response["error"]["message"] == "Path not in configured sandbox"
-
 
 
 @pytest.mark.asyncio
@@ -159,6 +160,11 @@ async def test_request_file(testing_backend):
     for image_type in ["thumbnail", "url"]:
         req = requests.get(result[image_type])
         assert req.status_code == HTTPOk.status_code
+
+    payload = {"method": "RequestFile", "id": "2", "params": {"path": "/file.pdf"}}
+    response = await testing_backend.send_ws(payload)
+    assert response["id"] == "2"
+    assert response["result"]
 
 
 @pytest.mark.asyncio
@@ -243,7 +249,6 @@ async def test_list_directory(testing_backend):
         "params": {"path": "bbb_vertical.mp4"},
     }
     response = await testing_backend.send_ws(payload)
-    # TODO: Rework error codes
     assert response["error"]["code"] == config.WRONG_FILE_TYPE_REQUESTED
 
     payload = {
@@ -260,6 +265,13 @@ async def test_list_directory(testing_backend):
     dirs = response["result"]["directories"]
     assert isinstance(files, list)
     assert isinstance(dirs, list)
+
+    # Check if '/' path is handled correctly, i.e. transformed into VEEDRIVE_SANDBOX_PATH
+    payload = {"method": "ListDirectory", "id": "1", "params": {"path": "/"}}
+    response = await testing_backend.send_ws(payload)
+    files_root = response["result"]["files"]
+    assert isinstance(files_root, list)
+    assert files_root == files
 
 
 @pytest.mark.asyncio

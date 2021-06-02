@@ -20,6 +20,8 @@ class TestPath(unittest.TestCase):
             fs_manager.validate_path(os.path.join(config.SANDBOX_PATH, "/../"), "file")
         with self.assertRaises(PermissionError):
             fs_manager.validate_path(os.path.join(config.SANDBOX_PATH, "../"), "file")
+        with self.assertRaises(PermissionError):
+            fs_manager.validate_path(os.path.join(config.SANDBOX_PATH, "/"), "file")
         with self.assertRaises(FileNotFoundError):
             fs_manager.validate_path(
                 os.path.join(config.SANDBOX_PATH, "folder1", "file_not_exisiting"),

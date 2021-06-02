@@ -5,11 +5,12 @@ import os.path
 from .. import config
 from ..utils.asynchro import run_async
 from . import image, video
-from .fs_manager import validate_path
+from .utils import sanitize_path, validate_path
 
 logger = logging.getLogger(__name__)
 
 
+@sanitize_path
 def get_image_urls(path, client_size=None):
     """Get URLs of an image
 
@@ -20,6 +21,7 @@ def get_image_urls(path, client_size=None):
     :return: a dictionnary with all available URLs which can be used to fetch the image
     :rtype: dict
     """
+
     response = _create_file_url_response(path)
     if client_size:
         response[
@@ -28,6 +30,7 @@ def get_image_urls(path, client_size=None):
     return response
 
 
+@sanitize_path
 def get_file_urls(path):
     """Get URLs of a file
 
@@ -36,9 +39,11 @@ def get_file_urls(path):
     :return: a dictionnary with all available URLs which can be used to fetch the file
     :rtype: dict
     """
+
     return _create_file_url_response(path)
 
 
+@sanitize_path
 async def get_scaled_image(path, client_width, client_height, scaling_mode="fit"):
     """[summary]
 
@@ -55,7 +60,6 @@ async def get_scaled_image(path, client_width, client_height, scaling_mode="fit"
     :return: a scaled image and its http content-type
     :rtype: tuple(binary, str)
     """
-
     absolute_path = os.path.join(config.SANDBOX_PATH, path)
     validate_path(absolute_path)
     for ext in config.SUPPORTED_IMAGE_EXTENSIONS:
@@ -72,6 +76,7 @@ async def get_scaled_image(path, client_width, client_height, scaling_mode="fit"
             return scaled_image, "image/" + file_format
 
 
+@sanitize_path
 async def get_thumbnail(path, width=256, height=256, scaling_mode="fit"):
     """Get a thumbnail of object (image, video, document)
 
