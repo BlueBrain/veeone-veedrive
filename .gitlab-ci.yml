@@ -1,6 +1,6 @@
 include:
   - project: viz/ci/gitlabpipelines
-    ref: develop
+    ref: master
     file: index.yml
 
 pytest:

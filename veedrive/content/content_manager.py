@@ -125,7 +125,7 @@ def _create_file_url_response(path):
     thubmnail_url = (
         f"{config.CONTENT_URL}/thumb/{path}"
         if ext in config.SUPPORTED_THUMBNAIL_EXTENSIONS
-        else "null"
+        else None
     )
 
     response = {
@@ -141,7 +141,7 @@ def _add_scaled_url(response, path, client_size):
     scaled_url = (
         f"{config.CONTENT_URL}/scaled/{path}?width={client_size['width']}&height={client_size['height']}"
         if ext in config.SUPPORTED_THUMBNAIL_EXTENSIONS
-        else "null"
+        else None
     )
 
     response["scaled"] = scaled_url

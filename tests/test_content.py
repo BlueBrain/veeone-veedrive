@@ -244,7 +244,7 @@ async def test_get_movie_thumbnail_with_size_constraint(testing_backend):
 @pytest.mark.asyncio
 async def test_get_thumbnail_exception(testing_backend):
     thumbnail_url = await testing_backend.get_thumbnail_url("file1.txt")
-    assert thumbnail_url == "null"
+    assert thumbnail_url is None
 
     req = requests.get(f"{config.CONTENT_URL}/thumb/file1.txt")
     assert req.status_code == HTTPBadRequest.status_code
@@ -259,7 +259,7 @@ async def test_get_thumbnail_exception(testing_backend):
     }
     response = await testing_backend.send_ws(payload)
     result = response["result"]
-    assert result["scaled"] == "null"
+    assert result["scaled"] is None
 
 
 @pytest.mark.asyncio
