@@ -6,7 +6,7 @@ import pytz
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 4444
 
-SANDBOX_PATH = os.getenv("VEEDRIVE_MEDIA_PATH", "~/")
+SANDBOX_PATH = os.path.normpath(os.getenv("VEEDRIVE_MEDIA_PATH", "~/"))
 STATIC_CONTENT_URL = os.getenv(
     "VEEDRIVE_STATIC_CONTENT_URL", f"http://{DEFAULT_HOST}:{DEFAULT_PORT}/static"
 )
