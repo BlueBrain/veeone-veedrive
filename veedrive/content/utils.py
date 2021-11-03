@@ -1,5 +1,6 @@
 import os
 from functools import wraps
+from pathlib import Path
 
 from .. import config
 from ..utils.exceptions import WrongObjectType
@@ -26,8 +27,15 @@ def fix_root_slash(path):
 
 
 def validate_path(absolute_path, required_type="file"):
-    """Validate if a path can be accessed and if it is of a specific type."""
-    if config.SANDBOX_PATH not in os.path.abspath(absolute_path):
+    """Validate if a path is in a configured sandbox, can be accessed and if it is of a specific type."""
+    sandbox_path = Path(config.SANDBOX_PATH)
+    path_to_validate = Path(os.path.abspath(absolute_path))
+
+    path_in_sandbox = (
+        sandbox_path in path_to_validate.parents or sandbox_path == path_to_validate
+    )
+
+    if not path_in_sandbox:
         raise PermissionError("Path not in configured sandbox")
     if not os.path.exists(absolute_path):
         raise FileNotFoundError("Not found")

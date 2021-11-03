@@ -18,7 +18,7 @@ def list_directory(path):
     :return: a dict with two lists of dicts
     :rtype: dict{list, (dict)}
     """
-    absolute_dir_path = os.path.join(config.SANDBOX_PATH, path)
+    absolute_dir_path = os.path.normpath(os.path.join(config.SANDBOX_PATH, path))
     validate_path(absolute_dir_path, "dir")
 
     dirs = []
