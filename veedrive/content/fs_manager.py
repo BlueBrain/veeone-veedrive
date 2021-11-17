@@ -45,16 +45,6 @@ def list_directory(path):
 
 
 def search_file(name, starting_path=""):
-    def check_if_done(result):
-        if not result[search_id]["done"]:
-            raise Exception(
-                "Search in progress. Use SearchResult method to retrieve result"
-            )
-        else:
-            raise Exception(
-                "Search finished and not yet retrieved. Use SearchResult method to retrieve result"
-            )
-
     absolute_path = os.path.join(config.SANDBOX_PATH, starting_path)
     search_id = hashlib.md5(absolute_path.encode()).hexdigest()
 
@@ -64,11 +54,10 @@ def search_file(name, starting_path=""):
     except Exception as e:
         raise
 
-    try:
-        check_if_done(fs_search_results[search_id]["done"])
-    except KeyError:
+    if search_id not in fs_search_results:
         FileSystemCrawler(name, search_id, absolute_path).start()
-        return search_id
+
+    return search_id
 
 
 async def purge_search_results():
