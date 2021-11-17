@@ -51,13 +51,13 @@ async def search(data):
     except Exception as e:
         return jsonrpc.prepare_error(data, 70, str(e))
 
-    return jsonrpc.prepare_response(data, {"search_id": search_id})
+    return jsonrpc.prepare_response(data, {"searchId": search_id})
 
 
-@jsonrpc.validate_jsonrpc(required_param="search_id")
+@jsonrpc.validate_jsonrpc(required_param="searchId")
 async def get_search_result(data):
     """Handler for SearchResult JSON-RPC method """
-    search_id = data["params"]["search_id"]
+    search_id = data["params"]["searchId"]
 
     try:
         result = fs_search_results[search_id].copy()
