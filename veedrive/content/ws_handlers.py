@@ -1,6 +1,7 @@
 from ..utils import jsonrpc
 from ..utils.asynchro import run_async
 from . import content_manager, fs_manager
+from .fs_manager import fs_search_results
 
 
 @jsonrpc.validate_jsonrpc(required_param="path")
@@ -39,8 +40,37 @@ async def list_directory(data):
 
 @jsonrpc.validate_jsonrpc(required_param="name")
 async def search(data):
-    """Handler for RequestFile JSON-RPC method. Lists content of specified directory"""
-
+    """Handler for Search JSON-RPC method. Search media path for a file"""
     name = data["params"]["name"]
-    obj = await run_async(fs_manager.sarch_file_system, name)
-    return jsonrpc.prepare_response(data, obj)
+
+    try:
+        starting_path = data["params"]["starting_path"]
+        search_id = fs_manager.search_file(name, starting_path)
+    except KeyError:
+        search_id = fs_manager.search_file(name)
+    except Exception as e:
+        return jsonrpc.prepare_error(data, 70, str(e))
+
+    return jsonrpc.prepare_response(data, {"search_id": search_id})
+
+
+@jsonrpc.validate_jsonrpc(required_param="search_id")
+async def get_search_result(data):
+    """Handler for SearchResult JSON-RPC method """
+    search_id = data["params"]["search_id"]
+
+    try:
+        result = fs_search_results[search_id].copy()
+        try:
+            result.pop("started_at")
+            result.pop("finished_at")
+        except KeyError:
+            pass
+        if result["done"]:
+            fs_search_results.pop(search_id)
+        return jsonrpc.prepare_response(data, result)
+
+    except KeyError as e:
+        return jsonrpc.prepare_error(
+            data, 69, f"search id {search_id} has not been yet created"
+        )

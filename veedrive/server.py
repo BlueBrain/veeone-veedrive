@@ -35,15 +35,35 @@ async def handle_ws(request):
                 try:
                     response = await process_request(data)
                 except KeyError as e:
-                    await ws.send_str(str(jsonrpc.prepare_error(data, config.MALFORMED_REQUEST, "Malformed")))
+                    await ws.send_str(
+                        str(
+                            jsonrpc.prepare_error(
+                                data, config.MALFORMED_REQUEST, "Malformed"
+                            )
+                        )
+                    )
                 except CodeException as e:
                     await ws.send_str(str(jsonrpc.prepare_error_code(data, e)))
                 except PermissionError as e:
-                    await ws.send_str(str(jsonrpc.prepare_error(data, config.PERMISSION_DENIED, str(e))))
+                    await ws.send_str(
+                        str(
+                            jsonrpc.prepare_error(
+                                data, config.PERMISSION_DENIED, str(e)
+                            )
+                        )
+                    )
                 except FileNotFoundError as e:
-                    await ws.send_str(str(jsonrpc.prepare_error(data, config.PATH_NOT_FOUND, str(e))))
+                    await ws.send_str(
+                        str(jsonrpc.prepare_error(data, config.PATH_NOT_FOUND, str(e)))
+                    )
                 except WrongObjectType as e:
-                    await ws.send_str(str(jsonrpc.prepare_error(data, config.WRONG_FILE_TYPE_REQUESTED, str(e))))
+                    await ws.send_str(
+                        str(
+                            jsonrpc.prepare_error(
+                                data, config.WRONG_FILE_TYPE_REQUESTED, str(e)
+                            )
+                        )
+                    )
 
                 await ws.send_str(str(response))
 
@@ -62,6 +82,8 @@ async def process_request(data):
         return await content_handler.list_directory(data)
     elif method == "Search":
         return await content_handler.search(data)
+    elif method == "SearchResult":
+        return await content_handler.get_search_result(data)
 
     # Scene
     elif method == "ListScenes":

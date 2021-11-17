@@ -17,6 +17,14 @@ DB_NAME = os.getenv("VEEDRIVE_DB_NAME", "test_database")
 DB_HOST = os.getenv("VEEDRIVE_DB_HOST", "127.0.0.1")
 DB_PORT = os.getenv("VEEDRIVE_DB_PORT", 27017)
 
+SEARCH_FS_KEEP_FINISHED_INTERVAL = int(
+    os.getenv("VEEDRIVE_SEARCH_FS_KEEP_FINISHED_INTERVAL", 10)
+)
+SEARCH_FS_THREAD_TIMEOUT = int(os.getenv("VEEDRIVE_SEARCH_FS_THREAD_TIMEOUT", 600))
+SEARCH_FS_PURGE_LOOP_INTERVAL = int(
+    os.getenv("VEEDRIVE_SEARCH_FS_PURGE_LOOP_INTERVAL", 60)
+)
+
 if os.getenv("VEEDRIVE_LOG_LEVEL") == "DEBUG":
     logger_level = logging.DEBUG
 else:
