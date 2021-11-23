@@ -44,9 +44,13 @@ def list_directory(path):
     return {"directories": dirs, "files": files}
 
 
-def search_file(name, starting_path=""):
+def generate_search_id(absolute_path, name):
+    return hashlib.md5(absolute_path.encode()).hexdigest() + "_" + name
+
+
+def search_file(search_query: str, starting_path=""):
     absolute_path = os.path.join(config.SANDBOX_PATH, starting_path)
-    search_id = hashlib.md5(absolute_path.encode()).hexdigest()
+    search_id = generate_search_id(absolute_path, search_query)
 
     try:
         absolute_path = os.path.join(config.SANDBOX_PATH, starting_path)
@@ -55,7 +59,7 @@ def search_file(name, starting_path=""):
         raise
 
     if search_id not in fs_search_results:
-        FileSystemCrawler(name, search_id, absolute_path).start()
+        FileSystemCrawler(search_query, search_id, absolute_path).start()
 
     return search_id
 
