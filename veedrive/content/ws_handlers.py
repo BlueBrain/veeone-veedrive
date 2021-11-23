@@ -41,13 +41,13 @@ async def list_directory(data):
 @jsonrpc.validate_jsonrpc(required_param="name")
 async def search(data):
     """Handler for Search JSON-RPC method. Search media path for a file"""
-    name = data["params"]["name"]
+    search_query = data["params"]["name"]
 
     try:
         starting_path = data["params"]["starting_path"]
-        search_id = fs_manager.search_file(name, starting_path)
+        search_id = fs_manager.search_file(search_query, starting_path)
     except KeyError:
-        search_id = fs_manager.search_file(name)
+        search_id = fs_manager.search_file(search_query)
     except Exception as e:
         return jsonrpc.prepare_error(data, 70, str(e))
 

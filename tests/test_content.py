@@ -300,8 +300,8 @@ async def test_list_directory(testing_backend):
 async def test_search(testing_backend):
     payload = {"method": "Search", "id": "1", "params": {"name": "bbb"}}
     response = await testing_backend.send_ws(payload)
-    search_id = response["result"]["searchId"]
-    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id}}
+    search_id_1 = response["result"]["searchId"]
+    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id_1}}
     response = await testing_backend.send_ws(payload)
 
     files = response["result"]["files"]
@@ -311,31 +311,34 @@ async def test_search(testing_backend):
     payload = {"method": "Search", "id": "1", "params": {"name": "folder"}}
     response = await testing_backend.send_ws(payload)
 
-    search_id = response["result"]["searchId"]
-    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id}}
+    search_id_2 = response["result"]["searchId"]
+
+    assert search_id_1 != search_id_2
+
+    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id_2}}
     response = await testing_backend.send_ws(payload)
     dirs = response["result"]["directories"]
     assert isinstance(dirs, list)
     assert len(dirs) == 2
 
-    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id}}
+    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id_2}}
     response = await testing_backend.send_ws(payload)
     assert (
         response["error"]["message"]
-        == f"search id {search_id} has not been yet created"
+        == f"search id {search_id_2} has not been yet created"
     )
 
     payload = {"method": "Search", "id": "1", "params": {"name": "folder"}}
     response = await testing_backend.send_ws(payload)
-    search_id = response["result"]["searchId"]
+    search_id_2 = response["result"]["searchId"]
 
     time.sleep(
         config.SEARCH_FS_KEEP_FINISHED_INTERVAL + config.SEARCH_FS_PURGE_LOOP_INTERVAL
     )
 
-    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id}}
+    payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id_2}}
     response = await testing_backend.send_ws(payload)
     assert (
         response["error"]["message"]
-        == f"search id {search_id} has not been yet created"
+        == f"search id {search_id_2} has not been yet created"
     )
