@@ -1,6 +1,6 @@
 import asyncio
-import asyncio.subprocess as subprocess
 import logging
+import subprocess
 
 import cv2
 import numpy
@@ -15,12 +15,10 @@ def resize_image(path, box_width, box_height, scaling_mode, ext):
     return transform_image(img, box_width, box_height, scaling_mode, ext)
 
 
-async def generate_pdf(path, box_width, box_height, scaling_mode):
+def generate_pdf(path, box_width, box_height, scaling_mode):
     im_args = ["convert", "-background", "white", path + "[0]", "bmp:-"]
-    process = await asyncio.subprocess.create_subprocess_exec(
-        *im_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    stdout, stderr = await process.communicate()
+    process = subprocess.Popen(im_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
 
     buf = numpy.frombuffer(stdout, numpy.uint8)
     img = cv2.imdecode(buf, cv2.IMREAD_UNCHANGED)

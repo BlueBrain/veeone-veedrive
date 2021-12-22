@@ -1,4 +1,6 @@
+import hashlib
 import os
+import string
 from functools import wraps
 from pathlib import Path
 
@@ -49,3 +51,22 @@ def validate_path(absolute_path, required_type="file"):
             raise WrongObjectType("Not a directory")
     else:
         raise WrongObjectType()
+
+
+def get_hash(e):
+    return hashlib.md5(e.encode()).hexdigest()
+
+
+def get_dir_file_hash_pair(file):
+    hashed_path = get_hash(file)
+    return hashed_path[:2], hashed_path[2:]
+
+
+def create_cache_subfolders(cache_path):
+    cache_dirs = [
+        val1.lower() + val2.lower()
+        for val1 in string.hexdigits
+        for val2 in string.hexdigits
+    ]
+    absolute_dirs = [os.path.join(cache_path, dd) for dd in cache_dirs]
+    [os.makedirs(dir_to_create, exist_ok=True) for dir_to_create in absolute_dirs]

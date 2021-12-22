@@ -3,10 +3,12 @@ import os
 
 import pytz
 
-DEFAULT_HOST = "0.0.0.0"
-DEFAULT_PORT = 4444
+DEFAULT_HOST = os.getenv("VEEDRIVE_DEFAULT_HOST", "0.0.0.0")
+DEFAULT_PORT = os.getenv("VEEDRIVE_DEFAULT_PORT", 4444)
 
 SANDBOX_PATH = os.path.normpath(os.getenv("VEEDRIVE_MEDIA_PATH", "~/"))
+THUMBNAIL_CACHE_PATH = os.path.join(SANDBOX_PATH, "cache")
+
 STATIC_CONTENT_URL = os.getenv(
     "VEEDRIVE_STATIC_CONTENT_URL", f"http://{DEFAULT_HOST}:{DEFAULT_PORT}/static"
 )
@@ -37,8 +39,8 @@ TIMEZONE = pytz.timezone(os.getenv("VEEDRIVE_TIMEZONE", "CET"))
 IMAGE_EXTENSIONS_TO_ENCODE_TO_JPG = [".jpg", ".tiff"]
 IMAGE_EXTENSIONS_TO_ENCODE_TO_PNG = [".png"]
 
-SUPPORTED_IMAGE_EXTENSIONS = [".png", ".jpg", ".gif", ".tiff"]
-SUPPORTED_VIDEO_EXTENSIONS = [".avi", ".mp4"]
+SUPPORTED_IMAGE_EXTENSIONS = [".png", ".jpg", ".gif", ".tiff", ".jpeg", ".dsc"]
+SUPPORTED_VIDEO_EXTENSIONS = [".avi", ".mp4", ".webm", ".mkv", ".mov"]
 SUPPORTED_DOC_EXTENSIONS = [".pdf"]
 SUPPORTED_THUMBNAIL_EXTENSIONS = (
     SUPPORTED_IMAGE_EXTENSIONS + SUPPORTED_VIDEO_EXTENSIONS + SUPPORTED_DOC_EXTENSIONS

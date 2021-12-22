@@ -1,19 +1,19 @@
-import asyncio.subprocess
 import datetime
 import math
+import subprocess
 
 import cv2
 
 from .. import config
 
 
-async def get_video_thumbnail(path, box_width, box_height, scaling_mode):
+def get_video_thumbnail(path, box_width, box_height, scaling_mode):
     video = cv2.VideoCapture(path)
     video_height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
     video_width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
 
     # seek until 1% of video's duration
-    video_duration = await _get_video_length(path)
+    video_duration = _get_video_length(path)
     seek_time = str(datetime.timedelta(seconds=int(math.floor(video_duration / 100))))
 
     # fit the output to the specified box
@@ -24,11 +24,9 @@ async def get_video_thumbnail(path, box_width, box_height, scaling_mode):
     ffargs = compile_ffmpeg_args(
         seek_time, path, requested_size, scaling_mode, box_width, box_height
     )
+    process = subprocess.Popen(ffargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    process = await asyncio.subprocess.create_subprocess_exec(
-        *ffargs, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-    )
-    stdout, stderr = await process.communicate()
+    stdout, stderr = process.communicate()
     return stdout
 
 
@@ -77,7 +75,7 @@ def compile_ffmpeg_args(
     ]
 
 
-async def _get_video_length(file):
+def _get_video_length(file):
     ffprobe_args = [
         "ffprobe",
         "-v",
@@ -89,8 +87,8 @@ async def _get_video_length(file):
         file,
     ]
 
-    proc = await asyncio.subprocess.create_subprocess_exec(
-        *ffprobe_args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    proc = subprocess.Popen(
+        ffprobe_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
-    stdout, stderr = await proc.communicate()
+    stdout, stderr = proc.communicate()
     return float(stdout)
