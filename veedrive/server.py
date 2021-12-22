@@ -1,7 +1,11 @@
+import asyncio
 import json
 import logging
+import os.path
+from concurrent.futures import ProcessPoolExecutor
 
 import aiohttp
+import cv2
 from aiohttp import web
 from aiohttp.web import (HTTPBadRequest, HTTPForbidden,
                          HTTPInternalServerError, HTTPNotFound)
@@ -9,12 +13,14 @@ from aiohttp.web import (HTTPBadRequest, HTTPForbidden,
 from . import config
 from .content import content_manager
 from .content import ws_handlers as content_handler
+from .content.utils import get_dir_file_hash_pair
 from .presentation import ws_handlers as presentation_handler
 from .utils import jsonrpc
 from .utils.exceptions import CodeException, WrongObjectType
 
 logging.basicConfig(level=config.logger_level)
 logger = logging.getLogger(__name__)
+loop = asyncio.get_event_loop()
 
 
 async def handle_ws(request):
@@ -111,23 +117,53 @@ async def handle_thumbnail_request(request):
     """
     path = request.match_info["path"]
     try:
-        try:
-            width = int(request.query["width"])
-            height = int(request.query["height"])
-            mode = request.query["mode"]
-            data = await content_manager.get_thumbnail(path, width, height, mode)
-        except KeyError:
-            data = await content_manager.get_thumbnail(path)
+        extra_query_parms = "width", "height", "mode"
+        if not all(e in request.query.keys() for e in extra_query_parms):
+            thumnail_cache_path = os.path.join(*get_dir_file_hash_pair(path))
+            if os.path.exists(
+                os.path.join(config.THUMBNAIL_CACHE_PATH, thumnail_cache_path)
+            ):
+                return web.HTTPFound(
+                    f"{config.STATIC_CONTENT_URL}/cache/{thumnail_cache_path}"
+                )
+
+            with ProcessPoolExecutor(1) as process_executor:
+                await loop.run_in_executor(
+                    process_executor,
+                    content_manager.cache_thumbnail,
+                    path,
+                    config.THUMBNAIL_CACHE_PATH,
+                )
+            return web.HTTPFound(
+                f"{config.STATIC_CONTENT_URL}/cache/{thumnail_cache_path}"
+            )
+        else:
+            optional_params = [
+                int(request.query["width"]),
+                int(request.query["height"]),
+                request.query["mode"],
+            ]
+            with ProcessPoolExecutor(1) as process_executor:
+                data = await loop.run_in_executor(
+                    process_executor,
+                    content_manager.get_thumbnail,
+                    path,
+                    *optional_params,
+                )
         return web.Response(body=data[0], content_type=data[1])
     except FileNotFoundError as e:
         raise HTTPNotFound()
     except PermissionError as e:
         raise HTTPForbidden()
-    except (ValueError, TypeError):
-        raise HTTPBadRequest()
-    except Exception as e:
+    except (ValueError, TypeError) as e:
+
+        raise HTTPBadRequest(reason=e)
+    except cv2.error as e:
         logger.error(e)
-        raise e
+        raise HTTPInternalServerError(reason="Opencv cannot handle this request")
+    except Exception:
+        raise
+        raise HTTPInternalServerError
 
 
 async def handle_scaled_image_request(request):

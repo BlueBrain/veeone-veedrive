@@ -1,11 +1,17 @@
 import logging
 import os
 import os.path
+from pathlib import Path
+
+import cv2
+import numpy
 
 from .. import config
 from ..utils.asynchro import run_async
-from . import image, video
+from . import utils
+from .image import generate_pdf, resize_image
 from .utils import sanitize_path, validate_path
+from .video import get_video_thumbnail
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +70,7 @@ async def get_scaled_image(path, client_width, client_height, scaling_mode="fit"
     for ext in config.SUPPORTED_IMAGE_EXTENSIONS:
         if os.path.splitext(path)[1] == ext:
             scaled_image, file_format = await run_async(
-                image.resize_image,
+                resize_image,
                 absolute_path,
                 client_width,
                 client_height,
@@ -75,8 +81,35 @@ async def get_scaled_image(path, client_width, client_height, scaling_mode="fit"
             return scaled_image, "image/" + file_format
 
 
+def cache_thumbnail(file, cache_folder):
+    dir_hash, filename_hash = utils.get_dir_file_hash_pair(file)
+    thumbnail_path = Path(os.path.join(cache_folder, dir_hash, filename_hash))
+    if os.path.exists(thumbnail_path):
+        logger.info(f"[INFO] Skipping thumbnail generation of: {file}")
+        raise FileExistsError
+    try:
+        thumbnail = get_thumbnail(file)
+    except cv2.error as e:
+        logger.error(f"[ERROR] opencv issue with {file}, message {str(e)}")
+        raise
+    except Exception as e:
+        logger.error(
+            f"[ERROR] issue with {file}, exception {type(e).__name__}, message: {str(e)}",
+            flush=True,
+        )
+        raise
+    try:
+        buf = numpy.frombuffer(thumbnail[0], numpy.uint8)
+        buf.tofile(str(thumbnail_path))
+        logger.info(f"[INFO] Generated thumbnail of: {file}")
+    except Exception as e:
+        logger.error(f"[ERROR] Saving exception: {str(e)} on {file}")
+        raise
+    return thumbnail_path
+
+
 @sanitize_path
-async def get_thumbnail(path, width=256, height=256, scaling_mode="fit"):
+def get_thumbnail(path, width=256, height=256, scaling_mode="fit"):
     """Get a thumbnail of an object (image, video, document)
 
     :param path: relative to sandboxpath path of object
@@ -96,25 +129,25 @@ async def get_thumbnail(path, width=256, height=256, scaling_mode="fit"):
     absolute_path = os.path.join(config.SANDBOX_PATH, path)
     validate_path(absolute_path)
 
-    file_extension = os.path.splitext(path)[1]
+    file_extension = os.path.splitext(path)[1].lower()
 
     if file_extension not in config.SUPPORTED_THUMBNAIL_EXTENSIONS:
-        raise TypeError
+        raise TypeError(
+            f"Extension {file_extension} not supported for thumbnail generation"
+        )
 
     if file_extension in config.SUPPORTED_IMAGE_EXTENSIONS:
-        thumbnail, image_format = await run_async(
-            image.resize_image, absolute_path, width, height, scaling_mode, ".jpg"
+        thumbnail, image_format = resize_image(
+            absolute_path, width, height, scaling_mode, ".jpg"
         )
         return thumbnail, "image/" + image_format
     if file_extension == ".pdf":
-        thumbnail, image_format = await image.generate_pdf(
+        thumbnail, image_format = generate_pdf(
             absolute_path, width, height, scaling_mode
         )
         return thumbnail, "image/" + image_format
     if file_extension in config.SUPPORTED_VIDEO_EXTENSIONS:
-        thumbnail = await video.get_video_thumbnail(
-            absolute_path, width, height, scaling_mode
-        )
+        thumbnail = get_video_thumbnail(absolute_path, width, height, scaling_mode)
         return thumbnail, "image/gif"
 
 

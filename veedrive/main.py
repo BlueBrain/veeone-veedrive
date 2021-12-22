@@ -5,7 +5,7 @@ import logging
 from aiohttp import web
 
 from . import config, server
-from .content import fs_manager
+from .content import fs_manager, utils
 
 logging.basicConfig(level=config.logger_level)
 logger = logging.getLogger(__name__)
@@ -38,10 +38,11 @@ async def start_app():
             web.static("/static", config.SANDBOX_PATH),
         ]
     )
-    app_runner = web.AppRunner(app)
+    app_runner = web.AppRunner(app, access_log=None)
     await app_runner.setup()
 
     loop.create_task(fs_manager.purge_search_results())
+    utils.create_cache_subfolders(config.THUMBNAIL_CACHE_PATH)
 
     tcp_site = web.TCPSite(app_runner, args.address, args.port)
     logger.info(f"application server running at: {args.address}:{args.port}")

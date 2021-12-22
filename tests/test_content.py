@@ -151,6 +151,7 @@ async def test_request_file(testing_backend):
     assert response["id"] == "1"
 
     # Check for standard keys of result
+    print("RESPONSE, test_request_file " ,  response)
     assert response["id"] == "1"
     assert result["thumbnail"] == f"{config.CONTENT_URL}/thumb/file.pdf"
     assert result["url"] == f"{config.STATIC_CONTENT_URL}/file.pdf"
@@ -314,9 +315,11 @@ async def test_search(testing_backend):
     search_id_2 = response["result"]["searchId"]
 
     assert search_id_1 != search_id_2
-
     payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id_2}}
-    response = await testing_backend.send_ws(payload)
+    done = False
+    while not done:
+        response = await testing_backend.send_ws(payload)
+        done = response["result"]["done"]
     dirs = response["result"]["directories"]
     assert isinstance(dirs, list)
     assert len(dirs) == 2
