@@ -7,8 +7,12 @@ from concurrent.futures import ProcessPoolExecutor
 import aiohttp
 import cv2
 from aiohttp import web
-from aiohttp.web import (HTTPBadRequest, HTTPForbidden,
-                         HTTPInternalServerError, HTTPNotFound)
+from aiohttp.web import (
+    HTTPBadRequest,
+    HTTPForbidden,
+    HTTPInternalServerError,
+    HTTPNotFound,
+)
 
 from . import config
 from .content import content_manager
@@ -92,16 +96,18 @@ async def process_request(data):
         return await content_handler.get_search_result(data)
 
     # Scene
-    elif method == "ListScenes":
-        return await presentation_handler.list_scenes(data)
-    elif method == "SceneVersions":
+    elif method == "ListPresentations":
+        return await presentation_handler.list_presentations(data)
+    elif method == "GetPresentation":
+        return await presentation_handler.get_presentation(data)
+    elif method == "SavePresentation":
+        return await presentation_handler.save_presentation(data)
+    elif method == "PresentationVersions":
         return await presentation_handler.list_scene_versions(data)
-    elif method == "SaveScene":
-        return await presentation_handler.save_scene(data)
-    elif method == "DeleteScene":
-        return await presentation_handler.delete_scene(data)
-    elif method == "GetScene":
-        return await presentation_handler.get_scene(data)
+    elif method == "DeletePresentation":
+        return await presentation_handler.delete_presentation(data)
+    elif method == "PurgePresentations":
+        return await presentation_handler.purge_presentations(data)
     # Method not defined
     else:
         return jsonrpc.prepare_error(data, 404, "Method not defined")

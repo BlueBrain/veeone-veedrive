@@ -1,9 +1,11 @@
 import json
 
+from veedrive.utils.json_encoders import VeeDriveJSONEncoder
+
 
 def prepare_response(data, result):
     obj = {"id": data["id"], "result": result}
-    return json.dumps(obj)
+    return json.dumps(obj, cls=VeeDriveJSONEncoder)
 
 
 def prepare_error(data, error_code, error_description=""):
