@@ -1,9 +1,14 @@
+import logging
+
+from pymongo.results import InsertOneResult
+
 from ..utils import jsonrpc
 from . import presentation_manager
-from .presentation import Scene, Topic, Window
+
+logger = logging.getLogger(__name__)
 
 
-async def get_scene(data):
+async def get_presentation(data):
     """Handler for ListScenes JSON-RPC method.
 
     :param data: JSON-RPC object
@@ -12,7 +17,10 @@ async def get_scene(data):
     :rtype: dict
     """
 
-    presentation = await presentation_manager.get_scene(name=data["params"]["name"])
+    presentation = await presentation_manager.get_presentation(
+        presentation_id=data["params"]["id"]
+    )
+    del presentation["_id"]
     return jsonrpc.prepare_response(data, presentation)
 
 
@@ -25,13 +33,13 @@ async def list_scene_versions(data):
     :rtype: dict
     """
 
-    presentation_versions = await presentation_manager.get_scene_versions(
-        name=data["params"]["name"]
+    presentation_versions = await presentation_manager.get_presentation_versions(
+        presentation_id=data["params"]["id"]
     )
     return jsonrpc.prepare_response(data, presentation_versions)
 
 
-async def list_scenes(data):
+async def list_presentations(data):
     """Handler for ListScenes JSON-RPC method.
 
     :param data: JSON-RPC object
@@ -40,11 +48,11 @@ async def list_scenes(data):
     :rtype: dict
     """
 
-    presentation_list = await presentation_manager.get_scenes()
-    return jsonrpc.prepare_response(data, presentation_list)
+    response = await presentation_manager.get_presentations()
+    return jsonrpc.prepare_response(data, response)
 
 
-async def save_scene(data):
+async def save_presentation(data):
     """Handler for SaveScene JSON-RPC method.
 
     :param data: JSON-RPC object
@@ -52,22 +60,18 @@ async def save_scene(data):
     :return: JSON-RPC object
     :rtype: dict
     """
-    topics = []
-    scene_param = data["params"]["presentation"]
-    for t in scene_param["topics"]:
-        windows = []
-        for w in t["windows"]:
-            window = Window.create_from_json(w)
-            windows.append(window)
-        topic = Topic(t["name"], windows)
-        topics.append(topic)
-
-    new_scene = Scene(scene_param["name"], topics)
-    await presentation_manager.save_scene(new_scene)
-    return jsonrpc.prepare_response(data, 0)
+    presentation_data = data["params"]
+    logger.info(f"presentation_data={type(presentation_data)} => {presentation_data}")
+    result: InsertOneResult = await presentation_manager.save_presentation_to_storage(
+        presentation_data
+    )
+    logger.info(
+        f"Response from Mongo: {result.inserted_id} ({type(result.inserted_id)})"
+    )
+    return jsonrpc.prepare_response(data, str(result.inserted_id))
 
 
-async def delete_scene(data):
+async def delete_presentation(data):
     """Handler for DeleteScene JSON-RPC method.
 
     :param data: JSON-RPC object
@@ -75,5 +79,10 @@ async def delete_scene(data):
     :return: JSON-RPC object
     :rtype: dict
     """
-    await presentation_manager.delete_scene(data["params"]["name"])
+    await presentation_manager.delete_presentation(data["params"]["id"])
     return jsonrpc.prepare_response(data, 0)
+
+
+async def purge_presentations(data):
+    await presentation_manager.purge_presentations()
+    return jsonrpc.prepare_response(data, "OK")
