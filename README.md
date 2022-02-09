@@ -3,9 +3,11 @@
 ## Running
 
 ```
-export VEEDRIVE_HOST_MEDIA_PATH=path_to_media_folder
+export MEDIA_PATH=path_to_media_folder # if ommited, tests/sandbox_folder will be used
 make run-docker
 ```
+if you want to change MEDIA_PATH you need to remove a previously created volume with:
+`docker volume rm media_volume`
 
 ## Running tests with coverage report
 It is the easiest to run tests in a Docker container:

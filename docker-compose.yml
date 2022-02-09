@@ -1,16 +1,33 @@
 version: "3"
 services:
-  web:
+  backend:
     build: .
     environment:
       - VEEDRIVE_MEDIA_PATH=/media
       - VEEDRIVE_DB_HOST=mongo
-    ports:
-      - "4444:4444"
+      - VEEDRIVE_STATIC_CONTENT_URL=http://localhost:8080/static
+      - VEEDRIVE_CONTENT_URL=http://localhost:8080/content
     volumes:
       - .:/app
-      - ${VEEDRIVE_HOST_MEDIA_PATH:-./tests/sandbox_folder/}:/media
+      - media_volume:/media
     depends_on:
       - mongo
+  nginx:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - media_volume:/media/static
+    depends_on:
+      - backend
+
   mongo:
     image: "mongo:latest"
+volumes:
+  media_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VEEDRIVE_MEDIA_PATH:-$PWD/tests/sandbox_folder}
