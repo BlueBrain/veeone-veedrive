@@ -27,4 +27,4 @@ docker-build-image:
 docker-publish-image:
   extends: .publish-image-using-kaniko
   variables:
-    CI_REGISTRY_IMAGE: $CI_REGISTRY/bbp-ou-visualization/veedrive
+    CI_REGISTRY_IMAGE: $CI_REGISTRY/viz/veeone/veedrive
