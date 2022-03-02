@@ -1,33 +1,46 @@
 version: "3"
 services:
   backend:
-    build: .
+    user: ${BACKEND_USER}
+    image:  bbpgitlab.epfl.ch:5050/viz/veeone/veedrive
     environment:
-      - VEEDRIVE_MEDIA_PATH=/media
+      - VEEDRIVE_MEDIA_PATH=/media/
       - VEEDRIVE_DB_HOST=mongo
-      - VEEDRIVE_STATIC_CONTENT_URL=http://localhost:8080/static
-      - VEEDRIVE_CONTENT_URL=http://localhost:8080/content
+      - VEEDRIVE_STATIC_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/static
+      - VEEDRIVE_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/content
+      - PYTHONUNBUFFERED=1
     volumes:
       - .:/app
-      - media_volume:/media
+      - ${VEEDRIVE_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media
     depends_on:
       - mongo
   nginx:
+    user: ${NGINX_USER}
     image: nginx
     ports:
-      - "8080:80"
+      - "8080:443"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - media_volume:/media/static
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ${VEEDRIVE_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media/static
+      - ssl_volume:/ssl
     depends_on:
-      - backend
-
+     - backend
   mongo:
     image: "mongo:latest"
+    volumes:
+      -  mongo_volume:/data/db/
+
 volumes:
-  media_volume:
+  ssl_volume:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${VEEDRIVE_MEDIA_PATH:-$PWD/tests/sandbox_folder}
+      device: /etc/letsencrypt
+  mongo_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/mongodb/store/volume1
