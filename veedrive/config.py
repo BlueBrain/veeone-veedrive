@@ -34,6 +34,12 @@ else:
 
 TIMEZONE = pytz.timezone(os.getenv("VEEDRIVE_TIMEZONE", "CET"))
 
+USE_ORIGIN_AUTH = False
+if os.getenv("VEEDRIVE_ORIGIN_WHITELIST", None):
+    ORIGIN_WHITELIST = os.environ["VEEDRIVE_ORIGIN_WHITELIST"].split(",")
+else:
+    ORIGIN_WHITELIST = ['127.0.0.1']
+
 # Constants.  Don't change!
 
 IMAGE_EXTENSIONS_TO_ENCODE_TO_JPG = [".jpg", ".tiff"]

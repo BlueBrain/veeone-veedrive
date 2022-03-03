@@ -12,6 +12,7 @@ from aiohttp.web import (
     HTTPForbidden,
     HTTPInternalServerError,
     HTTPNotFound,
+    HTTPOk
 )
 
 from . import config
@@ -192,3 +193,16 @@ async def handle_scaled_image_request(request):
     except Exception as e:
         logger.error(e)
         raise HTTPInternalServerError()
+
+
+async def authorized(request):
+    """ Authentication status endpoint handler.
+    If a request hasn't been rejected by a middleware it means
+    a request is authorized
+
+    :param request: request
+    :type request: class: `aiohttp.web.BaseRequest`
+    :return: 200 status code
+    :rtype: class: `aiohttp.web.Response`
+    """
+    return HTTPOk()
