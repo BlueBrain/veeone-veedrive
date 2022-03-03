@@ -22,12 +22,30 @@ parser.add_argument(
     help="address to bind to",
     default=config.DEFAULT_HOST,
 )
+parser.add_argument(
+    "--origin-auth",
+    dest="origin_auth",
+    action="store_true",
+    help="use host based auth",
+    default=config.USE_ORIGIN_AUTH,
+)
+
 
 args = parser.parse_args()
+config.USE_ORIGIN_AUTH = args.origin_auth
+
+
+def get_middlewares():
+    middlewares = []
+    if config.USE_ORIGIN_AUTH:
+        from .auth.middlewares import origin_based_auth
+        middlewares.append(origin_based_auth)
+        print(f"Adding origin based authentication with following whitelist: {config.ORIGIN_WHITELIST}")
+    return middlewares
 
 
 async def start_app():
-    app = web.Application()
+    app = web.Application(middlewares=get_middlewares())
     app.router.add_routes(
         [
             web.get("/ws", server.handle_ws),
@@ -36,6 +54,7 @@ async def start_app():
                 "/content/scaled/{path:[^{}]+}", server.handle_scaled_image_request
             ),
             web.static("/static", config.SANDBOX_PATH),
+            web.get("/authorized", server.authorized),
         ]
     )
     app_runner = web.AppRunner(app, access_log=None)

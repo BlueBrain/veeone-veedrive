@@ -8,6 +8,7 @@ services:
       - VEEDRIVE_DB_HOST=mongo
       - VEEDRIVE_STATIC_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/static
       - VEEDRIVE_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/content
+      - VEEDRIVE_ORIGIN_WHITELIST=127.0.0.1,10.80.13.24,10.80.13.25,10.80.13.26,10.80.13.30
       - PYTHONUNBUFFERED=1
     volumes:
       - .:/app
