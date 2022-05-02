@@ -12,7 +12,6 @@ def resize_image(path, box_width, box_height, scaling_mode, ext):
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
     return transform_image(img, box_width, box_height, scaling_mode, ext)
 
-
 def generate_pdf(path, box_width, box_height, scaling_mode):
     im_args = ["convert", "-background", "white", path + "[0]", "bmp:-"]
     process = subprocess.Popen(im_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -38,11 +37,38 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
         resized_image = resize_to_fill(
             img, image_width, image_height, box_width, box_height
         )
+    elif scaling_mode == config.PRESERVE_ASPECT:
+        resized_image = resize(img)
     else:
         raise Exception("Not supported scaling_mode")
 
     return encode_image(resized_image, ext)
 
+
+def resize(img):
+    max_height = 4096
+    max_width = 4096
+
+    image_height = img.shape[0]
+    image_width = img.shape[1]
+    image_aspect = image_width / image_height
+
+    try:
+        if image_aspect > 1:
+            if image_width <= max_width:
+                return img
+            return cv2.resize(img, (max_width, int(max_width / image_aspect)), interpolation=cv2.INTER_AREA)
+        else:
+            if image_height <= max_height:
+                return img
+            return cv2.resize(img, (int (max_width * image_aspect), max_height), interpolation=cv2.INTER_AREA)
+    except Exception as e:
+        print("e, ", e)
+    # 1000x500
+    # aspect =2
+
+    # 400x1000
+    # aspect 0.4
 
 def resize_to_fit(img, image_width, image_height, box_width, box_height):
     requested_aspect = box_width / box_height

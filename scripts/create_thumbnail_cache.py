@@ -1,3 +1,4 @@
+
 import argparse
 import asyncio
 import os
@@ -11,7 +12,8 @@ import scandir
 import veedrive.config
 import veedrive.content.content_manager
 from veedrive.content import utils
-from veedrive.content.content_manager import cache_thumbnail
+from veedrive.content.content_manager import optimize_image, cache_thumbnail
+
 
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument(
@@ -40,6 +42,23 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--mode",
+    "-m",
+    dest="mode",
+    type=str,
+    help="Operation mode. Thumb to generate thumbnails (video, pdf, images), optimize to render optimized images",
+    choices=["thumb", "optimize"],
+    default="optimize",
+)
+
+parser.add_argument(
+    "--debug",
+    dest="debug",
+    action="store_true",
+    help="Debug mode, will print exceptions",
+)
+
+parser.add_argument(
     "--report",
     "-r",
     dest="report",
@@ -50,7 +69,6 @@ parser.add_argument(
     2 - print list of successful and skipped""",
     default=0,
 )
-
 
 args = parser.parse_args()
 
@@ -75,15 +93,12 @@ def print_report(result_dict, t_start):
             print("ERRORED:")
             print(*(e + "\n" for e in (result_dict["err"])))
     print(f"[INFO] Success: {nb_ok}, Errors: {nb_err}, Skipped: {nb_skipped}")
-    print(f"[INFO] Elapsed time is {time.perf_counter() - t_start:.2} seconds")
+    print(f"[INFO] Elapsed time is {time.perf_counter() - t_start:.2f} seconds")
 
 
-def get_all_supported_files(sandbox_root):
+def get_all_supported_files(sandbox_root, supported_exts):
     def is_supported(file_name):
-        return (
-            os.path.splitext(file_name)[1].lower()
-            in veedrive.config.SUPPORTED_THUMBNAIL_EXTENSIONS
-        )
+        return os.path.splitext(file_name)[1].lower() in supported_exts
 
     scan_result = scandir.walk(sandbox_root)
 
@@ -104,10 +119,12 @@ def chunk(list_to_chunk, chunk_size):
 
 def generate_thumbnails(images_to_convert, media_path, cache_folder, result_queue):
     veedrive.config.SANDBOX_PATH = media_path
-
     for f in images_to_convert:
         try:
-            cache_thumbnail(f, cache_folder)
+            if args.mode == "optimize":
+                optimize_image(f, media_path, cache_folder)
+            elif args.mode == "thumb":
+                cache_thumbnail(f, cache_folder)
             dic = result_queue.get()
             dic["ok"].append(f)
             result_queue.put(dic)
@@ -116,12 +133,20 @@ def generate_thumbnails(images_to_convert, media_path, cache_folder, result_queu
             dic["skipped"].append(f)
             result_queue.put(dic)
         except Exception as e:
+            if args.debug:
+                print(f"[ERROR]: {str(e)}")
             dic = result_queue.get()
             dic["err"].append(f)
             result_queue.put(dic)
 
 
 async def main():
+    supported_exts = (
+        veedrive.config.SUPPORTED_IMAGE_EXTENSIONS
+        if args.mode == "optimize"
+        else veedrive.config.SUPPORTED_THUMBNAIL_EXTENSIONS
+    )
+
     media_path = args.source
     cache_folder = args.destination
     no_cpu = args.no_cpu
@@ -129,7 +154,7 @@ async def main():
 
     if no_cpu > os.cpu_count():
         print("[WARN] Starting with cpu count bigger than actual cpu count")
-    files = get_all_supported_files(media_path)
+    files = get_all_supported_files(media_path, supported_exts)
     random.shuffle(files)
 
     print(f"[INFO] No of files to generate: {len(files)}")
@@ -143,10 +168,9 @@ async def main():
 
     print(f"[INFO] number of chunks is {len(chunked_list)}")
 
-    utils.create_cache_subfolders(cache_folder)
-
+    if args.mode == "thumb":
+        utils.create_cache_subfolders(cache_folder)
     pool = Pool(processes=no_cpu)
-
     t_start = time.perf_counter()
 
     m = Manager()
