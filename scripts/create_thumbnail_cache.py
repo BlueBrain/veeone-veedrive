@@ -142,7 +142,7 @@ def generate_thumbnails(images_to_convert, media_path, cache_folder, result_queu
 
 async def main():
     supported_exts = (
-        veedrive.config.SUPPORTED_IMAGE_EXTENSIONS
+        veedrive.config.OPTIMIZABLE_IMAGE_EXTENSIONS
         if args.mode == "optimize"
         else veedrive.config.SUPPORTED_THUMBNAIL_EXTENSIONS
     )
