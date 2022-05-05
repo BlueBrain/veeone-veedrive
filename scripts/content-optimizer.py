@@ -14,7 +14,6 @@ import veedrive.content.content_manager
 from veedrive.content import utils
 from veedrive.content.content_manager import optimize_image, cache_thumbnail
 
-
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument(
     "--source",
@@ -70,6 +69,22 @@ parser.add_argument(
     default=0,
 )
 
+parser.add_argument(
+    "--max-width",
+    dest="max_width",
+    type=int,
+    help="Bounding box width",
+    default=4096,
+)
+
+parser.add_argument(
+    "--max-height",
+    dest="max_height",
+    type=int,
+    help="Bounding box height",
+    default=4096,
+)
+
 args = parser.parse_args()
 
 
@@ -122,7 +137,7 @@ def generate_thumbnails(images_to_convert, media_path, cache_folder, result_queu
     for f in images_to_convert:
         try:
             if args.mode == "optimize":
-                optimize_image(f, media_path, cache_folder)
+                optimize_image(f, media_path, cache_folder, args.max_width, args.max_height)
             elif args.mode == "thumb":
                 cache_thumbnail(f, cache_folder)
             dic = result_queue.get()

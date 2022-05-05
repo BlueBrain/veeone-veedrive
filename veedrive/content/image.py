@@ -38,30 +38,27 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
             img, image_width, image_height, box_width, box_height
         )
     elif scaling_mode == config.PRESERVE_ASPECT:
-        resized_image = resize(img)
+        resized_image = resize(img, box_width, box_height)
     else:
         raise Exception("Not supported scaling_mode")
 
     return encode_image(resized_image, ext)
 
 
-def resize(img):
-    max_height = 4096
-    max_width = 4096
-
+def resize(img, box_width, box_height):
     image_height = img.shape[0]
     image_width = img.shape[1]
     image_aspect = image_width / image_height
 
     try:
         if image_aspect > 1:
-            if image_width <= max_width:
+            if image_width <= box_width:
                 return img
-            return cv2.resize(img, (max_width, int(max_width / image_aspect)), interpolation=cv2.INTER_AREA)
+            return cv2.resize(img, (box_width, int(box_width / image_aspect)), interpolation=cv2.INTER_AREA)
         else:
-            if image_height <= max_height:
+            if image_height <= box_height:
                 return img
-            return cv2.resize(img, (int (max_width * image_aspect), max_height), interpolation=cv2.INTER_AREA)
+            return cv2.resize(img, (int (box_width * image_aspect), box_height), interpolation=cv2.INTER_AREA)
     except Exception as e:
         print("e, ", e)
     # 1000x500

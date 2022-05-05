@@ -95,22 +95,14 @@ def cache_thumbnail(file, cache_folder):
             f"[ERROR] issue with {file}, exception {type(e).__name__}, message: {str(e)}"
         )
         raise
-    try:
-        buf = numpy.frombuffer(thumbnail[0], numpy.uint8)
-        buf.tofile(str(thumbnail_path))
-        logging.info(f"[INFO] Generated thumbnail of: {file}")
-    except Exception as e:
-        logging.error(f"[ERROR] Saving exception: {str(e)} on {file}")
-        raise
+    _save_image(thumbnail, thumbnail_path, file)
     return thumbnail_path
 
 
-def optimize_image(file, media_path, cache_folder):
-    # dir_hash, filename_hash = utils.get_dir_file_hash_pair(file)
+def optimize_image(file, media_path, cache_folder, box_width, box_height):
 
     original_folder = os.path.dirname(file)
     filename = os.path.basename(file)
-
     absolute_dir = os.path.join(cache_folder, original_folder)
     os.makedirs(absolute_dir, exist_ok=True)
 
@@ -119,8 +111,7 @@ def optimize_image(file, media_path, cache_folder):
         logging.info(f"[INFO] Skipping thumbnail generation of: {file}")
         raise FileExistsError
     try:
-        thumbnail = resize_image(os.path.join(media_path, file), box_width=0, box_height=0, scaling_mode="preserve", ext=".jpg")
-        # thumbnail = convert_image(os.path.join(media_path, file), ".jpg")
+        thumbnail = resize_image(os.path.join(media_path, file), box_width=box_width, box_height=box_height, scaling_mode="preserve", ext=".jpg")
     except cv2.error as e:
         print(f"[ERROR] opencv issue with {file}, message {str(e)}")
         raise
@@ -129,13 +120,7 @@ def optimize_image(file, media_path, cache_folder):
             f"[ERROR] issue with {file}, exception {type(e).__name__}, message: {str(e)}"
         )
         raise
-    try:
-        buf = numpy.frombuffer(thumbnail[0], numpy.uint8)
-        buf.tofile(str(thumbnail_path))
-        logging.info(f"[INFO] Generated thumbnail of: {file}")
-    except Exception as e:
-        logging.error(f"[ERROR] Saving exception: {str(e)} on {file}")
-        raise
+    _save_image(thumbnail, thumbnail_path, file)
     return thumbnail_path
 
 
@@ -210,3 +195,13 @@ def _add_scaled_url(response, path, client_size):
 
     response["scaled"] = scaled_url
     return response
+
+
+def _save_image(thumbnail, thumbnail_path, file):
+    try:
+        buf = numpy.frombuffer(thumbnail[0], numpy.uint8)
+        buf.tofile(str(thumbnail_path))
+        logging.info(f"[INFO] Generated thumbnail of: {file}")
+    except Exception as e:
+        logging.error(f"[ERROR] Saving exception: {str(e)} on {file}")
+        raise
