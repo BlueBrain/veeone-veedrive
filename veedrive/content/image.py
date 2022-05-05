@@ -28,28 +28,28 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
 
     if image_aspect > 1:
         if box_width >= image_width:
-            return encode_image(img, ext)
+            return _encode_image(img, ext)
     else:
         if box_height >= image_height:
-            return encode_image(img, ext)
+            return _encode_image(img, ext)
 
     if scaling_mode == config.FIT_TRANSFORM_IMAGE:
-        resized_image = resize_to_fit(
+        resized_image = _resize_to_fit(
             img, image_width, image_height, box_width, box_height
         )
     elif scaling_mode == config.FILL_TRANSFORM_IMAGE:
-        resized_image = resize_to_fill(
+        resized_image = _resize_to_fill(
             img, image_width, image_height, box_width, box_height
         )
     elif scaling_mode == config.PRESERVE_ASPECT:
-        resized_image = resize(img, box_width, box_height)
+        resized_image = _resize(img, box_width, box_height)
     else:
         raise Exception("Not supported scaling_mode")
 
-    return encode_image(resized_image, ext)
+    return _encode_image(resized_image, ext)
 
 
-def resize(img, box_width, box_height):
+def _resize(img, box_width, box_height):
     image_height, image_width = img.shape[:2]
     image_aspect = image_width / image_height
 
@@ -70,7 +70,7 @@ def resize(img, box_width, box_height):
         logger.error(f"ERORR: {str(e)}")
 
 
-def resize_to_fit(img, image_width, image_height, box_width, box_height):
+def _resize_to_fit(img, image_width, image_height, box_width, box_height):
     requested_aspect = box_width / box_height
     image_aspect = image_width / image_height
 
@@ -90,7 +90,7 @@ def resize_to_fit(img, image_width, image_height, box_width, box_height):
     return cv2.resize(img, requested_aspect, interpolation=cv2.INTER_AREA)
 
 
-def resize_to_fill(img, image_width, image_height, box_width, box_height):
+def _resize_to_fill(img, image_width, image_height, box_width, box_height):
     """fill the specified box with the output (cropping possible)"""
 
     ratio = max(box_width / image_width, box_height / image_height)
@@ -108,7 +108,7 @@ def resize_to_fill(img, image_width, image_height, box_width, box_height):
     return resized_image[top:bottom, left:right]
 
 
-def encode_image(image, extensions):
+def _encode_image(image, extensions):
     if extensions in config.IMAGE_EXTENSIONS_TO_ENCODE_TO_JPG:
         encoded = cv2.imencode(".jpg", image, [int(cv2.IMWRITE_JPEG_QUALITY), 90])[1]
         file_format = "jpg"
