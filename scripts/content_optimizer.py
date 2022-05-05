@@ -12,7 +12,7 @@ import scandir
 import veedrive.config
 import veedrive.content.content_manager
 from veedrive.content import utils
-from veedrive.content.content_manager import optimize_image, cache_thumbnail
+from veedrive.content.content_manager import cache_thumbnail, optimize_image
 
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument(
@@ -137,7 +137,9 @@ def generate_thumbnails(images_to_convert, media_path, cache_folder, result_queu
     for f in images_to_convert:
         try:
             if args.mode == "optimize":
-                optimize_image(f, media_path, cache_folder, args.max_width, args.max_height)
+                optimize_image(
+                    f, media_path, cache_folder, args.max_width, args.max_height
+                )
             elif args.mode == "thumb":
                 cache_thumbnail(f, cache_folder)
             dic = result_queue.get()

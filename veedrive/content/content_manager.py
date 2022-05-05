@@ -100,18 +100,23 @@ def cache_thumbnail(file, cache_folder):
 
 
 def optimize_image(file, media_path, cache_folder, box_width, box_height):
-
     original_folder = os.path.dirname(file)
     filename = os.path.basename(file)
     absolute_dir = os.path.join(cache_folder, original_folder)
     os.makedirs(absolute_dir, exist_ok=True)
 
-    thumbnail_path = Path(os.path.join(cache_folder, original_folder, filename))
-    if os.path.exists(thumbnail_path):
-        logging.info(f"[INFO] Skipping thumbnail generation of: {file}")
+    image_path = Path(os.path.join(cache_folder, original_folder, filename))
+    if os.path.exists(image_path):
+        logging.info(f"[INFO] Skipping optimized image generation of: {file}")
         raise FileExistsError
     try:
-        thumbnail = resize_image(os.path.join(media_path, file), box_width=box_width, box_height=box_height, scaling_mode="preserve", ext=".jpg")
+        resized_image = resize_image(
+            os.path.join(media_path, file),
+            box_width=box_width,
+            box_height=box_height,
+            scaling_mode="preserve",
+            ext=".jpg",
+        )
     except cv2.error as e:
         print(f"[ERROR] opencv issue with {file}, message {str(e)}")
         raise
@@ -120,8 +125,8 @@ def optimize_image(file, media_path, cache_folder, box_width, box_height):
             f"[ERROR] issue with {file}, exception {type(e).__name__}, message: {str(e)}"
         )
         raise
-    _save_image(thumbnail, thumbnail_path, file)
-    return thumbnail_path
+    _save_image(resized_image, image_path, file)
+    return image_path
 
 
 @sanitize_path

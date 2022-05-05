@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import subprocess
 
@@ -11,6 +10,7 @@ import veedrive.config as config
 def resize_image(path, box_width, box_height, scaling_mode, ext):
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
     return transform_image(img, box_width, box_height, scaling_mode, ext)
+
 
 def generate_pdf(path, box_width, box_height, scaling_mode):
     im_args = ["convert", "-background", "white", path + "[0]", "bmp:-"]
@@ -54,11 +54,19 @@ def resize(img, box_width, box_height):
         if image_aspect > 1:
             if image_width <= box_width:
                 return img
-            return cv2.resize(img, (box_width, int(box_width / image_aspect)), interpolation=cv2.INTER_AREA)
+            return cv2.resize(
+                img,
+                (box_width, int(box_width / image_aspect)),
+                interpolation=cv2.INTER_AREA,
+            )
         else:
             if image_height <= box_height:
                 return img
-            return cv2.resize(img, (int (box_width * image_aspect), box_height), interpolation=cv2.INTER_AREA)
+            return cv2.resize(
+                img,
+                (int(box_width * image_aspect), box_height),
+                interpolation=cv2.INTER_AREA,
+            )
     except Exception as e:
         print("e, ", e)
     # 1000x500
@@ -66,6 +74,7 @@ def resize(img, box_width, box_height):
 
     # 400x1000
     # aspect 0.4
+
 
 def resize_to_fit(img, image_width, image_height, box_width, box_height):
     requested_aspect = box_width / box_height
