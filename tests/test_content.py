@@ -338,6 +338,7 @@ async def test_search(testing_backend):
     time.sleep(
         config.SEARCH_FS_KEEP_FINISHED_INTERVAL + config.SEARCH_FS_PURGE_LOOP_INTERVAL
     )
+    print("dasdsaas")
 
     payload = {"method": "SearchResult", "id": "1", "params": {"searchId": search_id_2}}
     response = await testing_backend.send_ws(payload)

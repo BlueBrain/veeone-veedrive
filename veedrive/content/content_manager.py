@@ -100,6 +100,7 @@ def cache_thumbnail(file, cache_folder):
 
 
 def optimize_image(file, media_path, cache_folder, box_width, box_height):
+
     original_folder = os.path.dirname(file)
     filename = os.path.basename(file)
     absolute_dir = os.path.join(cache_folder, original_folder)
@@ -114,7 +115,7 @@ def optimize_image(file, media_path, cache_folder, box_width, box_height):
             os.path.join(media_path, file),
             box_width=box_width,
             box_height=box_height,
-            scaling_mode="preserve",
+            scaling_mode=config.PRESERVE_ASPECT,
             ext=".jpg",
         )
     except cv2.error as e:

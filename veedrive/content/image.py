@@ -23,11 +23,15 @@ def generate_pdf(path, box_width, box_height, scaling_mode):
 
 
 def transform_image(img, box_width, box_height, scaling_mode, ext):
-    image_height = img.shape[0]
-    image_width = img.shape[1]
+    image_height, image_width = img.shape[:2]
+    image_aspect = image_width / image_height
 
-    if box_height > img.shape[0] or box_width > img.shape[1]:
-        return encode_image(img, ext)
+    if image_aspect > 1:
+        if box_width >= image_width:
+            return encode_image(img, ext)
+    else:
+        if box_height >= image_height:
+            return encode_image(img, ext)
 
     if scaling_mode == config.FIT_TRANSFORM_IMAGE:
         resized_image = resize_to_fit(
@@ -46,9 +50,9 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
 
 
 def resize(img, box_width, box_height):
-    image_height = img.shape[0]
-    image_width = img.shape[1]
+    image_height, image_width = img.shape[:2]
     image_aspect = image_width / image_height
+    print("===> here")
 
     try:
         if image_aspect > 1:
@@ -57,7 +61,7 @@ def resize(img, box_width, box_height):
             return cv2.resize(
                 img,
                 (box_width, int(box_width / image_aspect)),
-                interpolation=cv2.INTER_AREA,
+                interpolation=cv2.INTER_NEAREST,
             )
         else:
             if image_height <= box_height:
@@ -65,15 +69,10 @@ def resize(img, box_width, box_height):
             return cv2.resize(
                 img,
                 (int(box_width * image_aspect), box_height),
-                interpolation=cv2.INTER_AREA,
+                interpolation=cv2. INTER_LINEAR ,
             )
     except Exception as e:
-        print("e, ", e)
-    # 1000x500
-    # aspect =2
-
-    # 400x1000
-    # aspect 0.4
+        logger.error(f"ERORR: {str(e)}")
 
 
 def resize_to_fit(img, image_width, image_height, box_width, box_height):
