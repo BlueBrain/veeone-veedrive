@@ -52,20 +52,15 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
 def resize(img, box_width, box_height):
     image_height, image_width = img.shape[:2]
     image_aspect = image_width / image_height
-    print("===> here")
 
     try:
         if image_aspect > 1:
-            if image_width <= box_width:
-                return img
             return cv2.resize(
                 img,
                 (box_width, int(box_width / image_aspect)),
                 interpolation=cv2.INTER_NEAREST,
             )
         else:
-            if image_height <= box_height:
-                return img
             return cv2.resize(
                 img,
                 (int(box_width * image_aspect), box_height),
