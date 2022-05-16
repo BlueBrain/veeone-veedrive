@@ -7,8 +7,6 @@ import numpy
 
 import veedrive.config as config
 
-logger = logging.getLogger(__name__)
-
 
 def resize_image(path, box_width, box_height, scaling_mode, ext):
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
@@ -51,17 +49,17 @@ def resize_to_fit(img, image_width, image_height, box_width, box_height):
     image_aspect = image_width / image_height
 
     if requested_aspect > image_aspect:
-        logger.debug(
+        logging.debug(
             f"requested box is wider than image: {requested_aspect} : {image_aspect}"
         )
-        logger.debug("so we take height and use it as a basis for calculation")
+        logging.debug("so we take height and use it as a basis for calculation")
 
         requested_aspect = (round(box_height * image_aspect), box_height)
     else:
-        logger.debug(
+        logging.debug(
             f"requested box is higher or eq to image: {requested_aspect} : {image_aspect}"
         )
-        logger.debug("so we take width and use it as a basis for calculation")
+        logging.debug("so we take width and use it as a basis for calculation")
         requested_aspect = (box_width, round(box_width / image_aspect))
     return cv2.resize(img, requested_aspect, interpolation=cv2.INTER_AREA)
 

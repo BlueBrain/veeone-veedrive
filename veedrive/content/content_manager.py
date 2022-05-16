@@ -13,8 +13,6 @@ from .image import generate_pdf, resize_image
 from .utils import sanitize_path, validate_path
 from .video import get_video_thumbnail
 
-logger = logging.getLogger(__name__)
-
 
 @sanitize_path
 def get_image_urls(path, client_size=None):
@@ -85,15 +83,15 @@ def cache_thumbnail(file, cache_folder):
     dir_hash, filename_hash = utils.get_dir_file_hash_pair(file)
     thumbnail_path = Path(os.path.join(cache_folder, dir_hash, filename_hash))
     if os.path.exists(thumbnail_path):
-        logger.info(f"[INFO] Skipping thumbnail generation of: {file}")
+        logging.info(f"[INFO] Skipping thumbnail generation of: {file}")
         raise FileExistsError
     try:
         thumbnail = get_thumbnail(file)
     except cv2.error as e:
-        logger.error(f"[ERROR] opencv issue with {file}, message {str(e)}")
+        logging.error(f"[ERROR] opencv issue with {file}, message {str(e)}")
         raise
     except Exception as e:
-        logger.error(
+        logging.error(
             f"[ERROR] issue with {file}, exception {type(e).__name__}, message: {str(e)}",
             flush=True,
         )
@@ -101,9 +99,9 @@ def cache_thumbnail(file, cache_folder):
     try:
         buf = numpy.frombuffer(thumbnail[0], numpy.uint8)
         buf.tofile(str(thumbnail_path))
-        logger.info(f"[INFO] Generated thumbnail of: {file}")
+        logging.info(f"[INFO] Generated thumbnail of: {file}")
     except Exception as e:
-        logger.error(f"[ERROR] Saving exception: {str(e)} on {file}")
+        logging.error(f"[ERROR] Saving exception: {str(e)} on {file}")
         raise
     return thumbnail_path
 

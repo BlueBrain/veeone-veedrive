@@ -1,4 +1,3 @@
-import logging
 import os
 
 import pytz
@@ -27,10 +26,10 @@ SEARCH_FS_PURGE_LOOP_INTERVAL = int(
     os.getenv("VEEDRIVE_SEARCH_FS_PURGE_LOOP_INTERVAL", 60)
 )
 
-if os.getenv("VEEDRIVE_LOG_LEVEL") == "DEBUG":
-    logger_level = logging.DEBUG
-else:
-    logger_level = logging.INFO
+LOG_LEVEL = os.getenv("VEEDRIVE_LOG_LEVEL", "INFO").upper()
+ENVIRONMENT = os.getenv("VEEDRIVE_ENVIRONMENT", None)
+HTTP_PROXY = os.getenv("HTTP_PROXY", None)
+SENTRY_DSN = os.getenv("VEEDRIVE_SENTRY_DSN", None)
 
 TIMEZONE = pytz.timezone(os.getenv("VEEDRIVE_TIMEZONE", "CET"))
 
