@@ -93,9 +93,7 @@ def get_all_supported_files(sandbox_root):
             rel_path = os.path.relpath(path, sandbox_root)
             if rel_path == ".":
                 rel_path = ""
-            all_files += [
-                os.path.join(rel_path, f) for f in files if is_supported(e)
-            ]
+            all_files += [os.path.join(rel_path, f) for f in files if is_supported(f)]
     return all_files
 
 

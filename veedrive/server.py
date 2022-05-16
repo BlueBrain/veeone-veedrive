@@ -7,13 +7,8 @@ from concurrent.futures import ProcessPoolExecutor
 import aiohttp
 import cv2
 from aiohttp import web
-from aiohttp.web import (
-    HTTPBadRequest,
-    HTTPForbidden,
-    HTTPInternalServerError,
-    HTTPNotFound,
-    HTTPOk
-)
+from aiohttp.web import (HTTPBadRequest, HTTPForbidden,
+                         HTTPInternalServerError, HTTPNotFound, HTTPOk)
 
 from . import config
 from .content import content_manager
@@ -194,7 +189,7 @@ async def handle_scaled_image_request(request):
 
 
 async def authorized(request):
-    """ Authentication status endpoint handler.
+    """Authentication status endpoint handler.
     If a request hasn't been rejected by a middleware it means
     a request is authorized
 
