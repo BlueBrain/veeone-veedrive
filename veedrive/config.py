@@ -27,9 +27,9 @@ SEARCH_FS_PURGE_LOOP_INTERVAL = int(
 )
 
 LOG_LEVEL = os.getenv("VEEDRIVE_LOG_LEVEL", "INFO").upper()
-ENVIRONMENT = os.getenv("VEEDRIVE_ENVIRONMENT", None)
-HTTP_PROXY = os.getenv("HTTP_PROXY", None)
-SENTRY_DSN = os.getenv("VEEDRIVE_SENTRY_DSN", None)
+ENVIRONMENT = os.getenv("VEEDRIVE_ENVIRONMENT")
+HTTP_PROXY = os.getenv("HTTP_PROXY")
+SENTRY_DSN = os.getenv("VEEDRIVE_SENTRY_DSN")
 
 TIMEZONE = pytz.timezone(os.getenv("VEEDRIVE_TIMEZONE", "CET"))
 

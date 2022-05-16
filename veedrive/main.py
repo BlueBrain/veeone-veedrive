@@ -6,7 +6,7 @@ from aiohttp import web
 
 from . import config, server
 from .content import fs_manager, utils
-from .utils import logger
+from .utils import logger, sentry
 
 parser = argparse.ArgumentParser(description="websocket proxy application")
 parser.add_argument(
@@ -45,6 +45,10 @@ def get_middlewares():
 
 
 async def start_app():
+
+    if config.ENVIRONMENT:
+        sentry.set_up()
+
     app = web.Application(middlewares=get_middlewares())
     app.router.add_routes(
         [
