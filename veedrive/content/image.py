@@ -55,16 +55,24 @@ def _resize(img, box_width, box_height):
 
     try:
         if image_aspect > 1:
+            if round(box_width / image_aspect) > box_height:
+                target_size = (round(box_height * image_aspect), box_height)
+            else:
+                target_size = (box_width, round(box_width / image_aspect))
             return cv2.resize(
                 img,
-                (box_width, int(box_width / image_aspect)),
+                target_size,
                 interpolation=cv2.INTER_NEAREST,
             )
         else:
+            if round(box_height * image_aspect) > box_width:
+                target_size = (box_width, round(box_width / image_aspect))
+            else:
+                target_size = (round(box_height * image_aspect), box_height)
             return cv2.resize(
                 img,
-                (int(box_width * image_aspect), box_height),
-                interpolation=cv2. INTER_LINEAR ,
+                target_size,
+                interpolation=cv2.INTER_LINEAR,
             )
     except Exception as e:
         logger.error(f"ERORR: {str(e)}")

@@ -99,7 +99,7 @@ def cache_thumbnail(file, cache_folder):
     return thumbnail_path
 
 
-def optimize_image(file, media_path, cache_folder, box_width, box_height):
+def optimize_image(file, sandbox_path, cache_folder, box_width, box_height):
 
     original_folder = os.path.dirname(file)
     filename = os.path.basename(file)
@@ -112,7 +112,7 @@ def optimize_image(file, media_path, cache_folder, box_width, box_height):
         raise FileExistsError
     try:
         resized_image = resize_image(
-            os.path.join(media_path, file),
+            os.path.join(sandbox_path, file),
             box_width=box_width,
             box_height=box_height,
             scaling_mode=config.PRESERVE_ASPECT,
