@@ -12,7 +12,7 @@ services:
       - VEEDRIVE_ORIGIN_WHITELIST=127.0.0.1,10.80.13.24,10.80.13.25,10.80.13.26,10.80.13.30
       - VEEDRIVE_ENVIRONMENT=prod
       - VEEDRIVE_SENTRY_DSN=https://9f266d5dba2449b79cdb49622353bd96@o224246.ingest.sentry.io/6383792
-      - SENTRY_SAMPLE_RATE = 0.025
+      - VEEDRIVE_SENTRY_SAMPLE_RATE=0.05
       - HTTP_PROXY=http://bbpproxy.epfl.ch:80/
       - PYTHONUNBUFFERED=1
     volumes:
