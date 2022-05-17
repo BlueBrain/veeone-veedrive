@@ -17,7 +17,7 @@ def set_up():
         dsn=config.SENTRY_DSN,
         integrations=[sentry_logging, AioHttpIntegration()],
         environment=config.ENVIRONMENT,
-        traces_sample_rate=1.0,
-        debug=False,
+        traces_sample_rate=config.SENTRY_SAMPLE_RATE,
+        debug=config.SENTRY_DEBUG,
         http_proxy=config.HTTP_PROXY,
     )
