@@ -1,6 +1,7 @@
 version: "3"
 services:
   backend:
+    restart: always
     user: ${BACKEND_USER}
     image:  bbpgitlab.epfl.ch:5050/viz/veeone/veedrive
     environment:
@@ -9,6 +10,10 @@ services:
       - VEEDRIVE_STATIC_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/static
       - VEEDRIVE_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/content
       - VEEDRIVE_ORIGIN_WHITELIST=127.0.0.1,10.80.13.24,10.80.13.25,10.80.13.26,10.80.13.30
+      - VEEDRIVE_ENVIRONMENT=prod
+      - VEEDRIVE_SENTRY_DSN=https://9f266d5dba2449b79cdb49622353bd96@o224246.ingest.sentry.io/6383792
+      - SENTRY_SAMPLE_RATE = 0.025
+      - HTTP_PROXY=http://bbpproxy.epfl.ch:80/
       - PYTHONUNBUFFERED=1
     volumes:
       - .:/app
@@ -16,6 +21,7 @@ services:
     depends_on:
       - mongo
   nginx:
+    restart: always
     user: ${NGINX_USER}
     image: nginx
     ports:
@@ -28,6 +34,7 @@ services:
     depends_on:
      - backend
   mongo:
+    restart: always
     image: "mongo:latest"
     volumes:
       -  mongo_volume:/data/db/
