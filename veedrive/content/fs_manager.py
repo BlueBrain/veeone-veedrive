@@ -12,8 +12,6 @@ import scandir
 from .. import config
 from .utils import sanitize_path, validate_path
 
-logger = logging.getLogger(__name__)
-
 fs_search_results = {}
 
 
@@ -70,7 +68,7 @@ async def purge_search_results():
         delta = datetime.datetime.now() - finish_time
         if delta > datetime.timedelta(seconds=config.SEARCH_FS_KEEP_FINISHED_INTERVAL):
             fs_search_results.pop(e)
-            logger.debug(
+            logging.debug(
                 f"Purging Search result: {e} finished_at {finish_time} "
                 "and not retrieved by a client"
             )
@@ -83,7 +81,7 @@ async def purge_search_results():
                 if e == th.getName():
                     th.stop()
                     fs_search_results.pop(e)
-                    logger.debug(
+                    logging.debug(
                         f"Killed Search thread: {th.getName()}, started at {start_time}"
                     )
 
@@ -98,7 +96,7 @@ async def purge_search_results():
 
             await asyncio.sleep(config.SEARCH_FS_PURGE_LOOP_INTERVAL)
     except Exception as e:
-        logger.error(f"Purge search issue: {e}")
+        logging.error(f"Purge search issue: {e}")
 
 
 class FileSystemCrawler(threading.Thread):
@@ -153,7 +151,7 @@ class FileSystemCrawler(threading.Thread):
             t2 = time.perf_counter()
             search_result["done"] = True
             search_result["finished_at"] = datetime.datetime.now()
-            logger.debug(
+            logging.debug(
                 f"Search for '{name}' at path '{starting_path}' took {t2 - t1:.2f} s."
             )
         except Exception as e:

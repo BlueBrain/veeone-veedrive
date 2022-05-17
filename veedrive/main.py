@@ -6,9 +6,7 @@ from aiohttp import web
 
 from . import config, server
 from .content import fs_manager, utils
-
-logging.basicConfig(level=config.logger_level)
-logger = logging.getLogger(__name__)
+from .utils import logger, sentry
 
 parser = argparse.ArgumentParser(description="websocket proxy application")
 parser.add_argument(
@@ -40,11 +38,17 @@ def get_middlewares():
     if config.USE_ORIGIN_AUTH:
         from .auth.middlewares import origin_based_auth
         middlewares.append(origin_based_auth)
-        print(f"Adding origin based authentication with following whitelist: {config.ORIGIN_WHITELIST}")
+        logging.info(
+            f"Adding origin based authentication with following whitelist: {config.ORIGIN_WHITELIST}"
+        )
     return middlewares
 
 
 async def start_app():
+
+    if config.ENVIRONMENT:
+        sentry.set_up()
+
     app = web.Application(middlewares=get_middlewares())
     app.router.add_routes(
         [
@@ -64,7 +68,7 @@ async def start_app():
     utils.create_cache_subfolders(config.THUMBNAIL_CACHE_PATH)
 
     tcp_site = web.TCPSite(app_runner, args.address, args.port)
-    logger.info(f"application server running at: {args.address}:{args.port}")
+    logging.error(f"application server running at: {args.address}:{args.port}")
     await tcp_site.start()
     return app_runner, tcp_site
 

@@ -9,8 +9,6 @@ from pymongo.collection import Collection
 from .. import config
 from ..utils.exceptions import CodeException
 
-logger = logging.getLogger(__name__)
-
 mongo_client = motor.motor_asyncio.AsyncIOMotorClient(config.DB_HOST, config.DB_PORT)
 db = mongo_client[config.DB_NAME]
 archive_collection = db.presentation_archive_collection
@@ -58,7 +56,7 @@ async def get_presentations():
         presentation_list = map(
             _prepare_presentation_data, await cursor.to_list(length=100)
         )
-        logger.debug(f"Found presentations: {presentation_list}")
+        logging.debug(f"Found presentations: {presentation_list}")
     # TODO REMOVE?
     except Exception as e:
         raise CodeException(config.PRESENTATION_DB_ISSUE, f"execution error: {e}")

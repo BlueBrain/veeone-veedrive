@@ -7,13 +7,8 @@ from concurrent.futures import ProcessPoolExecutor
 import aiohttp
 import cv2
 from aiohttp import web
-from aiohttp.web import (
-    HTTPBadRequest,
-    HTTPForbidden,
-    HTTPInternalServerError,
-    HTTPNotFound,
-    HTTPOk
-)
+from aiohttp.web import (HTTPBadRequest, HTTPForbidden,
+                         HTTPInternalServerError, HTTPNotFound, HTTPOk)
 
 from . import config
 from .content import content_manager
@@ -23,8 +18,6 @@ from .presentation import ws_handlers as presentation_handler
 from .utils import jsonrpc
 from .utils.exceptions import CodeException, WrongObjectType
 
-logging.basicConfig(level=config.logger_level)
-logger = logging.getLogger(__name__)
 loop = asyncio.get_event_loop()
 
 
@@ -79,7 +72,7 @@ async def handle_ws(request):
                 await ws.send_str(str(response))
 
         elif msg.type == aiohttp.WSMsgType.ERROR:
-            logger.error(f"ws connection closed with exception {ws.exception()}")
+            logging.error(f"ws connection closed with exception {ws.exception()}")
 
 
 async def process_request(data):
@@ -166,7 +159,7 @@ async def handle_thumbnail_request(request):
 
         raise HTTPBadRequest(reason=e)
     except cv2.error as e:
-        logger.error(e)
+        logging.error(e)
         raise HTTPInternalServerError(reason="Opencv cannot handle this request")
     except Exception:
         raise
@@ -191,12 +184,12 @@ async def handle_scaled_image_request(request):
     except PermissionError:
         raise HTTPForbidden()
     except Exception as e:
-        logger.error(e)
+        logging.error(e)
         raise HTTPInternalServerError()
 
 
 async def authorized(request):
-    """ Authentication status endpoint handler.
+    """Authentication status endpoint handler.
     If a request hasn't been rejected by a middleware it means
     a request is authorized
 

@@ -151,7 +151,7 @@ async def test_request_file(testing_backend):
     assert response["id"] == "1"
 
     # Check for standard keys of result
-    print("RESPONSE, test_request_file " ,  response)
+    print("RESPONSE, test_request_file ", response)
     assert response["id"] == "1"
     assert result["thumbnail"] == f"{config.CONTENT_URL}/thumb/file.pdf"
     assert result["url"] == f"{config.STATIC_CONTENT_URL}/file.pdf"

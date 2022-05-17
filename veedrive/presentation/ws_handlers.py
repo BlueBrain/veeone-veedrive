@@ -5,8 +5,6 @@ from pymongo.results import InsertOneResult
 from ..utils import jsonrpc
 from . import presentation_manager
 
-logger = logging.getLogger(__name__)
-
 
 async def get_presentation(data):
     """Handler for ListScenes JSON-RPC method.
@@ -61,11 +59,11 @@ async def save_presentation(data):
     :rtype: dict
     """
     presentation_data = data["params"]
-    logger.info(f"presentation_data={type(presentation_data)} => {presentation_data}")
+    logging.info(f"presentation_data={type(presentation_data)} => {presentation_data}")
     result: InsertOneResult = await presentation_manager.save_presentation_to_storage(
         presentation_data
     )
-    logger.info(
+    logging.info(
         f"Response from Mongo: {result.inserted_id} ({type(result.inserted_id)})"
     )
     return jsonrpc.prepare_response(data, str(result.inserted_id))

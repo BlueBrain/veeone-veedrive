@@ -1,4 +1,3 @@
-import logging
 import os
 
 import pytz
@@ -27,10 +26,10 @@ SEARCH_FS_PURGE_LOOP_INTERVAL = int(
     os.getenv("VEEDRIVE_SEARCH_FS_PURGE_LOOP_INTERVAL", 60)
 )
 
-if os.getenv("VEEDRIVE_LOG_LEVEL") == "DEBUG":
-    logger_level = logging.DEBUG
-else:
-    logger_level = logging.INFO
+LOG_LEVEL = os.getenv("VEEDRIVE_LOG_LEVEL", "INFO").upper()
+ENVIRONMENT = os.getenv("VEEDRIVE_ENVIRONMENT")
+HTTP_PROXY = os.getenv("HTTP_PROXY")
+SENTRY_DSN = os.getenv("VEEDRIVE_SENTRY_DSN")
 
 TIMEZONE = pytz.timezone(os.getenv("VEEDRIVE_TIMEZONE", "CET"))
 
@@ -38,7 +37,7 @@ USE_ORIGIN_AUTH = False
 if os.getenv("VEEDRIVE_ORIGIN_WHITELIST", None):
     ORIGIN_WHITELIST = os.environ["VEEDRIVE_ORIGIN_WHITELIST"].split(",")
 else:
-    ORIGIN_WHITELIST = ['127.0.0.1']
+    ORIGIN_WHITELIST = ["127.0.0.1"]
 
 # Constants.  Don't change!
 
