@@ -85,6 +85,14 @@ parser.add_argument(
     default=4096,
 )
 
+parser.add_argument(
+    "--blacklist-folder-names",
+    dest="folder_blacklist",
+    nargs="+",
+    help="Blacklist of folder",
+    default=[]
+)
+
 args = parser.parse_args()
 
 
@@ -111,14 +119,23 @@ def print_report(result_dict, t_start):
     print(f"[INFO] Elapsed time is {time.perf_counter() - t_start:.2f} seconds")
 
 
-def get_all_supported_files(sandbox_root, supported_exts):
+def get_all_supported_files(sandbox_root, supported_exts, cache_folder):
     def is_supported(file_name):
         return os.path.splitext(file_name)[1].lower() in supported_exts
-
+    from pathlib import Path
     scan_result = scandir.walk(sandbox_root)
+
+    black_list = args.folder_blacklist
+    if Path(sandbox_root) in Path(cache_folder).parents:
+        relative_cache_path = (os.path.relpath(cache_folder, sandbox_root))
+        black_list += [ relative_cache_path ]
+
+    print(f"[INFO] black-listed folders {black_list}")
 
     all_files = []
     for path, directories, files in scan_result:
+        [print(f"[INFO] Folder {d} has been blacklisted, skiping")  for d in directories if d in black_list ]
+        directories[:] = [d for d in directories if d not in black_list]
         if files:
             rel_path = os.path.relpath(path, sandbox_root)
             if rel_path == ".":
@@ -171,14 +188,14 @@ async def main():
 
     if no_cpu > os.cpu_count():
         print("[WARN] Starting with cpu count bigger than actual cpu count")
-    files = get_all_supported_files(media_path, supported_exts)
+    files = get_all_supported_files(media_path, supported_exts, cache_folder)
     random.shuffle(files)
 
     print(f"[INFO] No of files to generate: {len(files)}")
     number_of_files = len(files)
 
     if number_of_files < no_cpu:
-        no_cpu = number_of_files
+        no_cpu = 1
 
     print(f"[INFO] chunk size is {chunk_size}")
     chunked_list = list(chunk(files, chunk_size))

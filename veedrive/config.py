@@ -43,10 +43,10 @@ else:
 
 # Constants.  Don't change!
 
-IMAGE_EXTENSIONS_TO_ENCODE_TO_JPG = [".jpg", ".tiff"]
+IMAGE_EXTENSIONS_TO_ENCODE_TO_JPG = [".jpg", ".tiff", ".tif"]
 IMAGE_EXTENSIONS_TO_ENCODE_TO_PNG = [".png"]
 
-SUPPORTED_IMAGE_EXTENSIONS = [".png", ".jpg", ".gif", ".tiff", ".jpeg", ".dsc"]
+SUPPORTED_IMAGE_EXTENSIONS = [".png", ".jpg", ".gif", ".tiff", ".jpeg", ".dsc", ".tif"]
 SUPPORTED_VIDEO_EXTENSIONS = [".avi", ".mp4", ".webm", ".mkv", ".mov"]
 SUPPORTED_DOC_EXTENSIONS = [".pdf"]
 SUPPORTED_THUMBNAIL_EXTENSIONS = (
