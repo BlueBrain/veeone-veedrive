@@ -6,6 +6,7 @@ import random
 import time
 from argparse import RawTextHelpFormatter
 from multiprocessing import Manager, Pool
+from pathlib import Path
 
 import scandir
 
@@ -89,8 +90,8 @@ parser.add_argument(
     "--blacklist-folder-names",
     dest="folder_blacklist",
     nargs="+",
-    help="Blacklist of folder",
-    default=[]
+    help="Blacklisted names of folders",
+    default=[],
 )
 
 args = parser.parse_args()
@@ -122,19 +123,23 @@ def print_report(result_dict, t_start):
 def get_all_supported_files(sandbox_root, supported_exts, cache_folder):
     def is_supported(file_name):
         return os.path.splitext(file_name)[1].lower() in supported_exts
-    from pathlib import Path
+
     scan_result = scandir.walk(sandbox_root)
 
     black_list = args.folder_blacklist
     if Path(sandbox_root) in Path(cache_folder).parents:
-        relative_cache_path = (os.path.relpath(cache_folder, sandbox_root))
-        black_list += [ relative_cache_path ]
+        relative_cache_path = os.path.relpath(cache_folder, sandbox_root)
+        black_list += [relative_cache_path]
 
     print(f"[INFO] black-listed folders {black_list}")
 
     all_files = []
     for path, directories, files in scan_result:
-        [print(f"[INFO] Folder {d} has been blacklisted, skiping")  for d in directories if d in black_list ]
+        [
+            print(f"[INFO] Folder {d} has been blacklisted, skiping")
+            for d in directories
+            if d in black_list
+        ]
         directories[:] = [d for d in directories if d not in black_list]
         if files:
             rel_path = os.path.relpath(path, sandbox_root)

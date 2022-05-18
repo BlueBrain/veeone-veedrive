@@ -1,5 +1,6 @@
 import os.path
 import unittest
+
 import cv2
 
 from ... import config
