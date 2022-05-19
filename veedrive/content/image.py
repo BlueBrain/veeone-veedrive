@@ -28,7 +28,7 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
 
     image_smaller_than_box = (
         image_aspect > 1.0 and box_width >= image_width
-    ) or box_height >= image_height
+    ) or (image_aspect <= 1.0 and box_height >= image_height)
     if image_smaller_than_box:
         return _encode_image(img, ext)
 
