@@ -1,4 +1,3 @@
-
 import argparse
 import asyncio
 import os
@@ -121,21 +120,21 @@ def get_all_supported_files(sandbox_root, supported_exts, cache_folder):
 
     scan_result = scandir.walk(sandbox_root)
 
-    black_list = args.folder_blacklist
+    blacklist = args.folder_blacklist
     if Path(sandbox_root) in Path(cache_folder).parents:
         relative_cache_path = os.path.relpath(cache_folder, sandbox_root)
-        black_list += [relative_cache_path]
+        blacklist += [relative_cache_path]
 
-    print(f"[INFO] black-listed folders {black_list}")
+    print(f"[INFO] blacklisted folders {blacklist}")
 
     all_files = []
     for path, directories, files in scan_result:
         [
             print(f"[INFO] Folder {d} has been blacklisted, skiping")
             for d in directories
-            if d in black_list
+            if d in blacklist
         ]
-        directories[:] = [d for d in directories if d not in black_list]
+        directories[:] = [d for d in directories if d not in blacklist]
         if files:
             rel_path = os.path.relpath(path, sandbox_root)
             if rel_path == ".":

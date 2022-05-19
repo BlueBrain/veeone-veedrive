@@ -26,12 +26,11 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
     image_height, image_width = img.shape[:2]
     image_aspect = (1.0 * image_width) / image_height
 
-    if image_aspect > 1.0:
-        if box_width >= image_width:
-            return _encode_image(img, ext)
-    else:
-        if box_height >= image_height:
-            return _encode_image(img, ext)
+    image_smaller_than_box = (
+        image_aspect > 1.0 and box_width >= image_width
+    ) or box_height >= image_height
+    if image_smaller_than_box:
+        return _encode_image(img, ext)
 
     if scaling_mode == config.FIT_TRANSFORM_IMAGE:
         resized_image = _resize_to_fit(
@@ -62,7 +61,7 @@ def _resize(img, box_width, box_height):
             return cv2.resize(
                 img,
                 target_size,
-                interpolation=cv2.INTER_NEAREST,
+                interpolation=cv2.INTER_AREA,
             )
         else:
             if round(box_height * image_aspect) > box_width:
@@ -72,10 +71,10 @@ def _resize(img, box_width, box_height):
             return cv2.resize(
                 img,
                 target_size,
-                interpolation=cv2.INTER_LINEAR,
+                interpolation=cv2.INTER_AREA,
             )
     except Exception as e:
-        logger.error(f"ERORR: {str(e)}")
+        logging.error(f"ERORR: {str(e)}")
 
 
 def _resize_to_fit(img, image_width, image_height, box_width, box_height):

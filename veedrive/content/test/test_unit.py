@@ -1,4 +1,5 @@
 import os.path
+import shutil
 import unittest
 
 import cv2
@@ -61,14 +62,14 @@ class TestContentOptimization(unittest.TestCase):
     sandbox_path = config.SANDBOX_PATH
 
     def setUp(self):
-        import shutil
-
         if os.path.exists(self.cache_folder):
             shutil.rmtree(self.cache_folder)
 
     def test_portait_image(self):
         file_name = "NeuronGroup.jpg"
-        img = cv2.imread(os.path.join(self.sandbox_path, file_name), cv2.IMREAD_UNCHANGED)
+        img = cv2.imread(
+            os.path.join(self.sandbox_path, file_name), cv2.IMREAD_UNCHANGED
+        )
 
         optimized = content_manager.optimize_image(
             file_name, self.sandbox_path, self.cache_folder, 4096, 4096
@@ -108,7 +109,9 @@ class TestContentOptimization(unittest.TestCase):
 
     def test_landscape_image(self):
         file_name = "HorizontalGroup.jpg"
-        img = cv2.imread(os.path.join(self.sandbox_path, file_name), cv2.IMREAD_UNCHANGED)
+        img = cv2.imread(
+            os.path.join(self.sandbox_path, file_name), cv2.IMREAD_UNCHANGED
+        )
 
         optimized = content_manager.optimize_image(
             file_name, self.sandbox_path, self.cache_folder, 4096, 4096
