@@ -17,17 +17,15 @@ from veedrive.content.content_manager import cache_thumbnail, optimize_image
 
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument(
-    "--source",
     "-s",
-    dest="source",
+    "--source",
     type=str,
     help="Path to media content",
     default="/nfs4/bbp.epfl.ch/media/DisplayWall",
 )
 parser.add_argument(
-    "--destination",
     "-d",
-    dest="destination",
+    "--destination",
     type=str,
     help="Path to cache content",
     default="/tmp",
@@ -42,9 +40,8 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--mode",
     "-m",
-    dest="mode",
+    "--mode",
     type=str,
     help="Operation mode. Thumb to generate thumbnails (video, pdf, images), optimize to render optimized images",
     choices=["thumb", "optimize"],
@@ -53,13 +50,11 @@ parser.add_argument(
 
 parser.add_argument(
     "--debug",
-    dest="debug",
     action="store_true",
     help="Debug mode, will print exceptions",
 )
 
 parser.add_argument(
-    "--report",
     "-r",
     dest="report",
     type=int,
