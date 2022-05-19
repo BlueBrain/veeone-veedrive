@@ -24,9 +24,9 @@ def generate_pdf(path, box_width, box_height, scaling_mode):
 
 def transform_image(img, box_width, box_height, scaling_mode, ext):
     image_height, image_width = img.shape[:2]
-    image_aspect = image_width / image_height
+    image_aspect = (1.0 * image_width) / image_height
 
-    if image_aspect > 1:
+    if image_aspect > 1.0:
         if box_width >= image_width:
             return _encode_image(img, ext)
     else:
@@ -51,10 +51,10 @@ def transform_image(img, box_width, box_height, scaling_mode, ext):
 
 def _resize(img, box_width, box_height):
     image_height, image_width = img.shape[:2]
-    image_aspect = image_width / image_height
+    image_aspect = (1.0 * image_width) / image_height
 
     try:
-        if image_aspect > 1:
+        if image_aspect > 1.0:
             if round(box_width / image_aspect) > box_height:
                 target_size = (round(box_height * image_aspect), box_height)
             else:
@@ -79,8 +79,8 @@ def _resize(img, box_width, box_height):
 
 
 def _resize_to_fit(img, image_width, image_height, box_width, box_height):
-    requested_aspect = box_width / box_height
-    image_aspect = image_width / image_height
+    requested_aspect = (1.0 * box_width) / box_height
+    image_aspect = (1.0 * image_width) / image_height
 
     if requested_aspect > image_aspect:
         logging.debug(
