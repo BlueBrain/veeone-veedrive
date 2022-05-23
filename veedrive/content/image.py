@@ -24,7 +24,7 @@ def generate_pdf(path, box_width, box_height, scaling_mode):
 
 def transform_image(img: numpy.ndarray, box_width, box_height, scaling_mode, ext):
     image_height, image_width = img.shape[:2]
-    image_aspect = (1.0 * image_width) / image_height
+    image_aspect = image_width / image_height
 
     image_smaller_than_box = (
         image_aspect > 1.0 and box_width >= image_width
@@ -50,7 +50,7 @@ def transform_image(img: numpy.ndarray, box_width, box_height, scaling_mode, ext
 
 def _resize(img: numpy.ndarray, box_width, box_height):
     image_height, image_width = img.shape[:2]
-    image_aspect = (1.0 * image_width) / image_height
+    image_aspect = image_width / image_height
 
     try:
         if image_aspect > 1.0:
@@ -78,8 +78,8 @@ def _resize(img: numpy.ndarray, box_width, box_height):
 
 
 def _resize_to_fit(img: numpy.ndarray, image_width, image_height, box_width, box_height):
-    requested_aspect = (1.0 * box_width) / box_height
-    image_aspect = (1.0 * image_width) / image_height
+    requested_aspect = box_width / box_height
+    image_aspect = image_width / image_height
 
     if requested_aspect > image_aspect:
         logging.debug(
