@@ -43,10 +43,11 @@ else:
 
 # Constants.  Don't change!
 
-IMAGE_EXTENSIONS_TO_ENCODE_TO_JPG = [".jpg", ".tiff"]
+IMAGE_EXTENSIONS_TO_ENCODE_TO_JPG = [".jpg", ".tiff", ".tif"]
 IMAGE_EXTENSIONS_TO_ENCODE_TO_PNG = [".png"]
 
-SUPPORTED_IMAGE_EXTENSIONS = [".png", ".jpg", ".gif", ".tiff", ".jpeg", ".dsc"]
+OPTIMIZABLE_IMAGE_EXTENSIONS = [".png", ".jpg", ".tiff", ".jpeg", ".dsc", ".tif"]
+SUPPORTED_IMAGE_EXTENSIONS = OPTIMIZABLE_IMAGE_EXTENSIONS + [".gif"]
 SUPPORTED_VIDEO_EXTENSIONS = [".avi", ".mp4", ".webm", ".mkv", ".mov"]
 SUPPORTED_DOC_EXTENSIONS = [".pdf"]
 SUPPORTED_THUMBNAIL_EXTENSIONS = (
@@ -55,6 +56,7 @@ SUPPORTED_THUMBNAIL_EXTENSIONS = (
 
 FIT_TRANSFORM_IMAGE = "fit"
 FILL_TRANSFORM_IMAGE = "fill"
+PRESERVE_ASPECT = "preserve"
 
 MALFORMED_REQUEST = 0
 PERMISSION_DENIED = 1

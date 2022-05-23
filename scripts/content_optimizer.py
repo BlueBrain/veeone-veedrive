@@ -5,27 +5,26 @@ import random
 import time
 from argparse import RawTextHelpFormatter
 from multiprocessing import Manager, Pool
+from pathlib import Path
 
 import scandir
 
 import veedrive.config
 import veedrive.content.content_manager
 from veedrive.content import utils
-from veedrive.content.content_manager import cache_thumbnail
+from veedrive.content.content_manager import cache_thumbnail, optimize_image
 
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument(
-    "--source",
     "-s",
-    dest="source",
+    "--source",
     type=str,
     help="Path to media content",
     default="/nfs4/bbp.epfl.ch/media/DisplayWall",
 )
 parser.add_argument(
-    "--destination",
     "-d",
-    dest="destination",
+    "--destination",
     type=str,
     help="Path to cache content",
     default="/tmp",
@@ -40,7 +39,21 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--report",
+    "-m",
+    "--mode",
+    type=str,
+    help="Operation mode. Thumb to generate thumbnails (video, pdf, images), optimize to render optimized images",
+    choices=["thumb", "optimize"],
+    default="optimize",
+)
+
+parser.add_argument(
+    "--debug",
+    action="store_true",
+    help="Debug mode, will print exceptions",
+)
+
+parser.add_argument(
     "-r",
     dest="report",
     type=int,
@@ -51,6 +64,29 @@ parser.add_argument(
     default=0,
 )
 
+parser.add_argument(
+    "--max-width",
+    dest="max_width",
+    type=int,
+    help="Bounding box width",
+    default=4096,
+)
+
+parser.add_argument(
+    "--max-height",
+    dest="max_height",
+    type=int,
+    help="Bounding box height",
+    default=4096,
+)
+
+parser.add_argument(
+    "--blacklist-folder-names",
+    dest="folder_blacklist",
+    nargs="+",
+    help="Blacklisted names of folders",
+    default=[],
+)
 
 args = parser.parse_args()
 
@@ -75,20 +111,30 @@ def print_report(result_dict, t_start):
             print("ERRORED:")
             print(*(e + "\n" for e in (result_dict["err"])))
     print(f"[INFO] Success: {nb_ok}, Errors: {nb_err}, Skipped: {nb_skipped}")
-    print(f"[INFO] Elapsed time is {time.perf_counter() - t_start:.2} seconds")
+    print(f"[INFO] Elapsed time is {time.perf_counter() - t_start:.2f} seconds")
 
 
-def get_all_supported_files(sandbox_root):
+def get_all_supported_files(sandbox_root, supported_exts, cache_folder):
     def is_supported(file_name):
-        return (
-            os.path.splitext(file_name)[1].lower()
-            in veedrive.config.SUPPORTED_THUMBNAIL_EXTENSIONS
-        )
+        return os.path.splitext(file_name)[1].lower() in supported_exts
 
     scan_result = scandir.walk(sandbox_root)
 
+    blacklist = args.folder_blacklist
+    if Path(sandbox_root) in Path(cache_folder).parents:
+        relative_cache_path = os.path.relpath(cache_folder, sandbox_root)
+        blacklist += [relative_cache_path]
+
+    print(f"[INFO] blacklisted folders {blacklist}")
+
     all_files = []
     for path, directories, files in scan_result:
+        [
+            print(f"[INFO] Folder {d} has been blacklisted, skiping")
+            for d in directories
+            if d in blacklist
+        ]
+        directories[:] = [d for d in directories if d not in blacklist]
         if files:
             rel_path = os.path.relpath(path, sandbox_root)
             if rel_path == ".":
@@ -104,10 +150,14 @@ def chunk(list_to_chunk, chunk_size):
 
 def generate_thumbnails(images_to_convert, media_path, cache_folder, result_queue):
     veedrive.config.SANDBOX_PATH = media_path
-
     for f in images_to_convert:
         try:
-            cache_thumbnail(f, cache_folder)
+            if args.mode == "optimize":
+                optimize_image(
+                    f, media_path, cache_folder, args.max_width, args.max_height
+                )
+            elif args.mode == "thumb":
+                cache_thumbnail(f, cache_folder)
             dic = result_queue.get()
             dic["ok"].append(f)
             result_queue.put(dic)
@@ -116,12 +166,20 @@ def generate_thumbnails(images_to_convert, media_path, cache_folder, result_queu
             dic["skipped"].append(f)
             result_queue.put(dic)
         except Exception as e:
+            if args.debug:
+                print(f"[ERROR]: {str(e)}")
             dic = result_queue.get()
             dic["err"].append(f)
             result_queue.put(dic)
 
 
 async def main():
+    supported_exts = (
+        veedrive.config.OPTIMIZABLE_IMAGE_EXTENSIONS
+        if args.mode == "optimize"
+        else veedrive.config.SUPPORTED_THUMBNAIL_EXTENSIONS
+    )
+
     media_path = args.source
     cache_folder = args.destination
     no_cpu = args.no_cpu
@@ -129,24 +187,23 @@ async def main():
 
     if no_cpu > os.cpu_count():
         print("[WARN] Starting with cpu count bigger than actual cpu count")
-    files = get_all_supported_files(media_path)
+    files = get_all_supported_files(media_path, supported_exts, cache_folder)
     random.shuffle(files)
 
     print(f"[INFO] No of files to generate: {len(files)}")
     number_of_files = len(files)
 
     if number_of_files < no_cpu:
-        no_cpu = number_of_files
+        no_cpu = 1
 
     print(f"[INFO] chunk size is {chunk_size}")
     chunked_list = list(chunk(files, chunk_size))
 
     print(f"[INFO] number of chunks is {len(chunked_list)}")
 
-    utils.create_cache_subfolders(cache_folder)
-
+    if args.mode == "thumb":
+        utils.create_cache_subfolders(cache_folder)
     pool = Pool(processes=no_cpu)
-
     t_start = time.perf_counter()
 
     m = Manager()

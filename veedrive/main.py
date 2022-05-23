@@ -37,6 +37,7 @@ def get_middlewares():
     middlewares = []
     if config.USE_ORIGIN_AUTH:
         from .auth.middlewares import origin_based_auth
+
         middlewares.append(origin_based_auth)
         logging.info(
             f"Adding origin based authentication with following whitelist: {config.ORIGIN_WHITELIST}"
