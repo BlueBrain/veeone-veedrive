@@ -15,5 +15,8 @@ RUN pip install --no-cache-dir -e .
 
 EXPOSE 4444
 
+HEALTHCHECK  --interval=10s --timeout=3s \
+  CMD python3 ws_healthcheck.py
+
 ENTRYPOINT ["python"]
 CMD ["-m", "veedrive.main"]
