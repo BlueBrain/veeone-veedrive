@@ -73,7 +73,7 @@ async def handle_ws(request):
 
         elif msg.type == aiohttp.WSMsgType.ERROR:
             logging.error(f"ws connection closed with exception {ws.exception()}")
-
+    return ws
 
 async def process_request(data):
     method = data["method"]
