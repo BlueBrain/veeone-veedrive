@@ -5,7 +5,7 @@ services:
     #build: .
     image:  bbpgitlab.epfl.ch:5050/viz/veeone/veedrive
     environment:
-      - VEEDRIVE_MEDIA_PATH=~/Media/
+      - VEEDRIVE_MEDIA_PATH=/media/
       - VEEDRIVE_DB_HOST=mongo
       - VEEDRIVE_STATIC_CONTENT_URL=http://localhost:8888/static
       - VEEDRIVE_CONTENT_URL=http://localhost:8888/content

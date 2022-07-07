@@ -1,9 +1,5 @@
-import logging
-
-from pymongo.results import InsertOneResult
-
 from ..utils import jsonrpc
-from . import presentation_manager
+from . import db_manager
 
 
 async def get_presentation(data):
@@ -15,10 +11,9 @@ async def get_presentation(data):
     :rtype: dict
     """
 
-    presentation = await presentation_manager.get_presentation(
+    presentation = await (await db_manager.get_db()).get_presentation(
         presentation_id=data["params"]["id"]
     )
-    del presentation["_id"]
     return jsonrpc.prepare_response(data, presentation)
 
 
@@ -31,7 +26,7 @@ async def list_scene_versions(data):
     :rtype: dict
     """
 
-    presentation_versions = await presentation_manager.get_presentation_versions(
+    presentation_versions = await (await db_manager.get_db()).get_presentation_versions(
         presentation_id=data["params"]["id"]
     )
     return jsonrpc.prepare_response(data, presentation_versions)
@@ -46,7 +41,11 @@ async def list_presentations(data):
     :rtype: dict
     """
 
-    response = await presentation_manager.get_presentations()
+    presentation_list = await (await db_manager.get_db()).get_presentations()
+    response = {
+        "results": presentation_list,
+        "count": len(presentation_list),
+    }
     return jsonrpc.prepare_response(data, response)
 
 
@@ -59,14 +58,10 @@ async def save_presentation(data):
     :rtype: dict
     """
     presentation_data = data["params"]
-    logging.info(f"presentation_data={type(presentation_data)} => {presentation_data}")
-    result: InsertOneResult = await presentation_manager.save_presentation_to_storage(
+    inserted_id: str = await (await db_manager.get_db()).save_presentation_to_storage(
         presentation_data
     )
-    logging.info(
-        f"Response from Mongo: {result.inserted_id} ({type(result.inserted_id)})"
-    )
-    return jsonrpc.prepare_response(data, str(result.inserted_id))
+    return jsonrpc.prepare_response(data, "ok")
 
 
 async def delete_presentation(data):
@@ -77,10 +72,10 @@ async def delete_presentation(data):
     :return: JSON-RPC object
     :rtype: dict
     """
-    await presentation_manager.delete_presentation(data["params"]["id"])
+    await (await db_manager.get_db()).delete_presentation(data["params"]["id"])
     return jsonrpc.prepare_response(data, 0)
 
 
 async def purge_presentations(data):
-    await presentation_manager.purge_presentations()
+    await (await db_manager.get_db()).purge_presentations()
     return jsonrpc.prepare_response(data, "OK")

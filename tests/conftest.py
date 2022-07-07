@@ -1,16 +1,50 @@
+import asyncio
 import json
 import os
 import signal
 import subprocess
 import time
 
+import pymongo
 import pytest
 import websockets
+from asyncpg import connect
 
 from veedrive import config
 
 FNULL = open(os.devnull, "w")
 server = None
+
+
+# Redefine event loop in order to run setup_db fixture in module scope
+@pytest.fixture(scope="module")
+def event_loop():
+    loop = asyncio.get_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="module")
+async def setup_db():
+    if config.DB_TYPE == "postgres":
+        conn = await connect(
+            database="postgres",
+            user="postgres",
+            host="localhost",
+            password="postgres",
+        )
+        await conn.execute(
+            "CREATE TABLE IF NOT EXISTS public.presentations (id SERIAL NOT NULL, data jsonb NOT NULL,  CONSTRAINT presentation_pkey PRIMARY KEY (id))"
+        )
+        await conn.execute(
+            "CREATE TABLE IF NOT EXISTS public.archived_presentations (id SERIAL NOT NULL, data jsonb NOT NULL, CONSTRAINT archived_presentation_pkey PRIMARY KEY (id))"
+        )
+        await conn.execute(f"DELETE from presentations;")
+        await conn.execute(f"DELETE from archived_presentations;")
+
+    if config.DB_TYPE == "mongo":
+        mongo_client = pymongo.MongoClient(config.DB_HOST, config.DB_PORT)
+        mongo_client.drop_database(config.DB_NAME)
 
 
 @pytest.fixture(scope="session")

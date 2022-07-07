@@ -75,6 +75,7 @@ async def handle_ws(request):
             logging.error(f"ws connection closed with exception {ws.exception()}")
     return ws
 
+
 async def process_request(data):
     method = data["method"]
     # Content

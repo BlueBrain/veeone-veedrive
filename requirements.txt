@@ -1,5 +1,6 @@
 aiohttp~=3.7.4.post0
 aiounittest~=1.4.0
+asyncpg~=0.25.0
 imageio~=2.9.0
 motor~=2.3.1
 numpy~=1.20.1
