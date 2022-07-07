@@ -1,4 +1,3 @@
-import pymongo
 import pytest
 
 from veedrive import config
@@ -7,9 +6,7 @@ presentation_test_id = "1509d5ec-163f-4a79-8942-4a8b74dbd438"
 
 
 @pytest.mark.asyncio
-async def test_save_and_load_presentation(testing_backend):
-    mongo_client = pymongo.MongoClient(config.DB_HOST, config.DB_PORT)
-    mongo_client.drop_database(config.DB_NAME)
+async def test_save_and_load_presentation(testing_backend, setup_db):
     presentation_payload = {"id": presentation_test_id, "name": "My presentation"}
     presentation_payload_update = {
         "id": presentation_test_id,
@@ -56,7 +53,7 @@ async def test_save_and_load_presentation(testing_backend):
 
 
 @pytest.mark.asyncio
-async def test_listing_presentations(testing_backend):
+async def test_listing_presentations(testing_backend, setup_db):
     request_payload = {
         "method": "ListPresentations",
         "id": "1",
@@ -71,7 +68,24 @@ async def test_listing_presentations(testing_backend):
 
 
 @pytest.mark.asyncio
-async def test_deleting_presentations(testing_backend):
+async def test_listing_presentation_versions(testing_backend, setup_db):
+    request_payload = {
+        "method": "PresentationVersions",
+        "id": "1",
+        "params": {"id": presentation_test_id},
+    }
+    await testing_backend.send_ws(request_payload)
+
+    response_load = await testing_backend.send_ws(request_payload)
+
+    assert "result" in response_load
+    result_list = response_load["result"]
+    assert result_list[0]["id"] == presentation_test_id
+    assert result_list[len(result_list) - 1]["id"] == presentation_test_id
+
+
+@pytest.mark.asyncio
+async def test_deleting_presentations(testing_backend, setup_db):
     request_payload = {
         "method": "DeletePresentation",
         "id": "1",

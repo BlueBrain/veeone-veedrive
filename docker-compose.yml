@@ -16,10 +16,16 @@ services:
       - VEEDRIVE_SENTRY_DEBUG=0
       - HTTP_PROXY=http://bbpproxy.epfl.ch:80/
       - PYTHONUNBUFFERED=1
+      - VEEDRIVE_DB_TYPE=postgres
+      - VEEDRIVE_DB_NAME=veedrive_dev
+      - VEEDRIVE_DB_HOST=postgresql14-users.bbp.epfl.ch
+      - VEEDRIVE_DB_USERNAME=veedrive_dev
+      - VEEDRIVE_DB_PASSWORD=REPLACE_ME
     volumes:
       - .:/app
       - ${VEEDRIVE_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media
     depends_on:
+    #TODO REMOVE AFTER MIGRATION TO CS HOSTED POSTGRES
       - mongo
   nginx:
     restart: always
@@ -34,6 +40,7 @@ services:
       - ssl_volume:/ssl
     depends_on:
      - backend
+  #TODO REMOVE AFTER MIGRATION TO CS HOSTED POSTGRES
   mongo:
     restart: always
     image: "mongo:latest"
@@ -47,6 +54,8 @@ volumes:
       type: none
       o: bind
       device: /etc/letsencrypt
+
+  #TODO REMOVE AFTER MIGRATION TO CS HOSTED POSTGRES
   mongo_volume:
     driver: local
     driver_opts:

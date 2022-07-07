@@ -14,12 +14,24 @@ pytest:
     VEEDRIVE_SEARCH_FS_KEEP_FINISHED_INTERVAL: 3
     VEEDRIVE_SEARCH_FS_PURGE_LOOP_INTERVAL: 10
     VEEDRIVE_DEFAULT_HOST: "127.0.0.1"
+    POSTGRES_PASSWORD: password
   before_script:
     - cp deploy/ImageMagick-6/policy.xml /etc/ImageMagick-6/
     - export VEEDRIVE_MEDIA_PATH=`pwd`/tests/sandbox_folder
     - echo $VEEDRIVE_MEDIA_PATH
   services:
     - mongo
+
+pytest-with-postgresql:
+  extends: pytest
+  variables:
+    VEEDRIVE_DB_TYPE: postgres
+    VEEDRIVE_DB_HOST: postgres
+    VEEDRIVE_DB_NAME: postgres
+    VEEDRIVE_DB_USERNAME: postgres
+    VEEDRIVE_DB_PASSWORD: postgres
+  services:
+    - postgres
 
 docker-build-image:
   extends: .build-image-using-kaniko

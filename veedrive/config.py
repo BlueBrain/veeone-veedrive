@@ -14,8 +14,11 @@ STATIC_CONTENT_URL = os.getenv(
 CONTENT_URL = os.getenv(
     "VEEDRIVE_CONTENT_URL", f"http://{DEFAULT_HOST}:{DEFAULT_PORT}/content"
 )
+DB_TYPE = os.getenv("VEEDRIVE_DB_TYPE", "mongo")
 DB_NAME = os.getenv("VEEDRIVE_DB_NAME", "test_database")
 DB_HOST = os.getenv("VEEDRIVE_DB_HOST", "127.0.0.1")
+DB_USERNAME = os.getenv("VEEDRIVE_DB_USERNAME")
+DB_PASSWORD = os.getenv("VEEDRIVE_DB_PASSWORD")
 DB_PORT = os.getenv("VEEDRIVE_DB_PORT", 27017)
 
 SEARCH_FS_KEEP_FINISHED_INTERVAL = int(
@@ -31,7 +34,7 @@ ENVIRONMENT = os.getenv("VEEDRIVE_ENVIRONMENT")
 HTTP_PROXY = os.getenv("HTTP_PROXY")
 SENTRY_DSN = os.getenv("VEEDRIVE_SENTRY_DSN")
 SENTRY_SAMPLE_RATE = float(os.getenv("VEEDRIVE_SENTRY_SAMPLE_RATE", 0.1))
-SENTRY_DEBUG = bool(int(os.getenv("VEEDRIVE_SENTRY_DEBUG",0)))
+SENTRY_DEBUG = bool(int(os.getenv("VEEDRIVE_SENTRY_DEBUG", 0)))
 
 TIMEZONE = pytz.timezone(os.getenv("VEEDRIVE_TIMEZONE", "CET"))
 
