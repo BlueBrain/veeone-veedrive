@@ -41,11 +41,16 @@ class MongoConnector(DBInterface):
         except Exception as e:
             raise CodeException(config.PRESENTATION_DB_ISSUE, f"execution error: {e}")
 
-    async def list_presentations(self):
+    async def list_presentations(self, folder=None):
         try:
-            cursor = presentation_collection.find().sort(
+            folder_filter_query = (
+                {"folder": folder} if folder else {"folder": {"$exists": False}}
+            )
+
+            cursor = presentation_collection.find(folder_filter_query).sort(
                 [("savedAt", pymongo.DESCENDING)]
             )
+
             presentation_list = map(
                 prepare_presentation_data, await cursor.to_list(length=100)
             )
