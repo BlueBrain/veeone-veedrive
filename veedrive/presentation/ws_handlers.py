@@ -41,7 +41,11 @@ async def list_presentations(data):
     :rtype: dict
     """
 
-    presentation_list = await (await db_manager.get_db()).get_presentations()
+    try:
+        folder = data["params"]["folder"]
+    except KeyError:
+        folder = None
+    presentation_list = await (await db_manager.get_db()).list_presentations(folder)
     response = {
         "results": presentation_list,
         "count": len(presentation_list),

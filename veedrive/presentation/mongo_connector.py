@@ -41,7 +41,7 @@ class MongoConnector(DBInterface):
         except Exception as e:
             raise CodeException(config.PRESENTATION_DB_ISSUE, f"execution error: {e}")
 
-    async def get_presentations(self):
+    async def list_presentations(self):
         try:
             cursor = presentation_collection.find().sort(
                 [("savedAt", pymongo.DESCENDING)]

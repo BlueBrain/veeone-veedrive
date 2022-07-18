@@ -44,8 +44,14 @@ class PgConnector(DBInterface):
         results = await self.conn.fetch(sql_string)
         return [json.loads(result[0]) for result in results]
 
-    async def get_presentations(self):
-        sql_string = f"SELECT data ::jsonb FROM presentations ORDER BY data ::jsonb ->> 'savedAt' DESC LIMIT 1000;"
+    async def list_presentations(self, folder=None):
+        folder_filter_string = (
+            f"WHERE data::jsonb ->> 'folder' = '{folder}'"
+            if folder
+            else "WHERE NOT data ::jsonb ? 'folder' "
+        )
+        sql_string = f"SELECT data ::jsonb FROM presentations {folder_filter_string} \
+                       ORDER BY data ::jsonb ->> 'savedAt' DESC LIMIT 1000;"
 
         full_list = [
             json.loads(result[0]) for result in await self.conn.fetch(sql_string)
