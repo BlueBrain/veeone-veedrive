@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Sentry integration
 - PostgreSQL support
+- Support for filtering presentations by "folder"
 
 ### Changed
 - Simplify logging

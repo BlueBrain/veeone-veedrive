@@ -23,7 +23,7 @@ class DBInterface:
         raise NotImplementedError
 
     @abstractmethod
-    def get_presentations(self):
+    def list_presentations(self):
         raise NotImplementedError
 
     @abstractmethod
