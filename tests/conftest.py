@@ -28,10 +28,10 @@ def event_loop():
 async def setup_db():
     if config.DB_TYPE == "postgres":
         conn = await connect(
-            database="postgres",
-            user="postgres",
-            host="localhost",
-            password="postgres",
+            database=config.DB_NAME,
+            user=config.DB_USERNAME,
+            host=config.DB_HOST,
+            password=config.DB_PASSWORD,
         )
         await conn.execute(
             "CREATE TABLE IF NOT EXISTS public.presentations (id SERIAL NOT NULL, data jsonb NOT NULL,  CONSTRAINT presentation_pkey PRIMARY KEY (id))"

@@ -2,63 +2,10 @@ version: "3"
 services:
   backend:
     restart: always
-    user: ${BACKEND_USER}
     image:  bbpgitlab.epfl.ch:5050/viz/veeone/veedrive
     environment:
       - VEEDRIVE_MEDIA_PATH=/media/
-      - VEEDRIVE_DB_HOST=mongo
-      - VEEDRIVE_STATIC_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/static
-      - VEEDRIVE_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/content
       - VEEDRIVE_ORIGIN_WHITELIST=127.0.0.1,10.80.13.24,10.80.13.25,10.80.13.26,10.80.13.30
-      - VEEDRIVE_ENVIRONMENT=prod
-      - VEEDRIVE_SENTRY_DSN=https://9f266d5dba2449b79cdb49622353bd96@o224246.ingest.sentry.io/6383792
-      - VEEDRIVE_SENTRY_SAMPLE_RATE=0.05
-      - VEEDRIVE_SENTRY_DEBUG=0
-      - HTTP_PROXY=http://bbpproxy.epfl.ch:80/
       - PYTHONUNBUFFERED=1
-      - VEEDRIVE_DB_TYPE=postgres
-      - VEEDRIVE_DB_NAME=veedrive_dev
-      - VEEDRIVE_DB_HOST=postgresql14-users.bbp.epfl.ch
-      - VEEDRIVE_DB_USERNAME=veedrive_dev
-      - VEEDRIVE_DB_PASSWORD=REPLACE_ME
     volumes:
-      - .:/app
-      - ${VEEDRIVE_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media
-    depends_on:
-    #TODO REMOVE AFTER MIGRATION TO CS HOSTED POSTGRES
-      - mongo
-  nginx:
-    restart: always
-    user: ${NGINX_USER}
-    image: nginx
-    ports:
-      - "8080:443"
-    volumes:
-      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ${VEEDRIVE_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media/
-      - ssl_volume:/ssl
-    depends_on:
-     - backend
-  #TODO REMOVE AFTER MIGRATION TO CS HOSTED POSTGRES
-  mongo:
-    restart: always
-    image: "mongo:latest"
-    volumes:
-      -  mongo_volume:/data/db/
-
-volumes:
-  ssl_volume:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /etc/letsencrypt
-
-  #TODO REMOVE AFTER MIGRATION TO CS HOSTED POSTGRES
-  mongo_volume:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /opt/mongodb/store/volume1
+      - ${HOST_VEEDRIVE_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media
