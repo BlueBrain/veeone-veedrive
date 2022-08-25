@@ -136,3 +136,54 @@ async def test_deleting_presentations(testing_backend, setup_db):
 
     assert "error" in response_load
     assert response_load["error"]["message"] == "Presentation not found"
+
+
+@pytest.mark.asyncio
+async def test_folder_creation(testing_backend, setup_db):
+    request_payload = {
+        "method": "CreateFolder",
+        "id": "1",
+        "params": {"folder_name": "folder1"},
+    }
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["result"] == "OK"
+
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["error"]["message"] == "Folder already exists"
+
+    request_payload["params"] = {"folder_name": "folder2"}
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["result"] == "OK"
+
+
+@pytest.mark.asyncio
+async def test_folder_listing(testing_backend, setup_db):
+    request_payload = {
+        "method": "ListFolders",
+        "id": "1",
+
+    }
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["result"] == ["folder1", "folder2"]
+
+
+@pytest.mark.asyncio
+async def test_folder_deletion(testing_backend, setup_db):
+    request_payload = {
+        "method": "RemoveFolder",
+        "id": "1",
+        "params": {"folder_name": "folder1"},
+    }
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["error"]["message"] == "Cannot remove, folder contains presentations"
+
+    request_payload["params"] = {"folder_name": "folder2"}
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["result"] == "OK"
+
+    request_payload = {
+        "method": "ListFolders",
+        "id": "1",
+    }
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["result"] == ["folder1"]
