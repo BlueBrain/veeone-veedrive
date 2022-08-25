@@ -78,7 +78,7 @@ class PgConnector(DBInterface):
         sql_string = f"DELETE from presentations;"
         return await self.conn.execute(sql_string)
 
-    async def add_folder(self, folder_name: str):
+    async def create_folder(self, folder_name: str):
         sql_string = f"INSERT INTO folders(name) VALUES ('{folder_name}') ;"
         try:
             await self.conn.execute(sql_string)
@@ -88,7 +88,7 @@ class PgConnector(DBInterface):
     async def remove_folder(self, folder_name: str):
         sql_string = f"DELETE FROM folders where name = '{folder_name}' RETURNING * ;"
         res = await self.conn.fetchval(sql_string)
-        if res is None:
+        if not res:
             raise Exception("Specified folder does not exist")
 
     async def list_folders(self):

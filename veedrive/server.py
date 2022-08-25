@@ -105,8 +105,8 @@ async def process_request(data):
         return await presentation_handler.purge_presentations(data)
     elif method == "ListFolders":
         return await presentation_handler.list_folders(data)
-    elif method == "AddFolder":
-        return await presentation_handler.add_folder(data)
+    elif method == "CreateFolder":
+        return await presentation_handler.create_folder(data)
     elif method == "RemoveFolder":
         return await presentation_handler.remove_folder(data)
     # Method not defined

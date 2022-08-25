@@ -39,7 +39,7 @@ class DBInterface:
         raise NotImplementedError
 
     @abstractmethod
-    def add_folder(self, folder_name: str):
+    def create_folder(self, folder_name: str):
         raise NotImplementedError
 
     @abstractmethod

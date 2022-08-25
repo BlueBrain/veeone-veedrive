@@ -85,8 +85,8 @@ async def purge_presentations(data):
     return jsonrpc.prepare_response(data, "OK")
 
 
-async def add_folder(data):
-    """Handler for AddFolder JSON-RPC method.
+async def create_folder(data):
+    """Handler for CreateFolder JSON-RPC method.
 
     :param data: JSON-RPC object
     :type data: dict
@@ -95,7 +95,7 @@ async def add_folder(data):
     """
     folder = data["params"]["folder"]
     try:
-        await (await db_manager.get_db()).add_folder(folder)
+        await (await db_manager.get_db()).create_folder(folder)
         return jsonrpc.prepare_response(data, 'OK')
     except Exception as e:
         return jsonrpc.prepare_error(data, 701, str(e))
@@ -129,5 +129,5 @@ async def list_folders(data):
     :return: JSON-RPC object
     :rtype: dict
     """
-    lista = await (await db_manager.get_db()).list_folders()
-    return jsonrpc.prepare_response(data, lista)
+    folder_list = await (await db_manager.get_db()).list_folders()
+    return jsonrpc.prepare_response(data, folder_list)
