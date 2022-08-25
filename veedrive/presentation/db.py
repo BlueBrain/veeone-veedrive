@@ -39,5 +39,17 @@ class DBInterface:
         raise NotImplementedError
 
     @abstractmethod
+    def add_folder(self, folder_name: str):
+        raise NotImplementedError
+
+    @abstractmethod
+    def list_folders(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def remove_folder(self, folder_name: str):
+        raise NotImplementedError
+
+    @abstractmethod
     def _archive_presentation(self, presentation):
         raise NotImplementedError
