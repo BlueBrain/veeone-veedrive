@@ -14,7 +14,7 @@ STATIC_CONTENT_URL = os.getenv(
 CONTENT_URL = os.getenv(
     "VEEDRIVE_CONTENT_URL", f"http://{DEFAULT_HOST}:{DEFAULT_PORT}/content"
 )
-DB_TYPE = os.getenv("VEEDRIVE_DB_TYPE", "mongo")
+DB_TYPE = os.getenv("VEEDRIVE_DB_TYPE", "postgres")
 DB_NAME = os.getenv("VEEDRIVE_DB_NAME", "test_database")
 DB_HOST = os.getenv("VEEDRIVE_DB_HOST", "127.0.0.1")
 DB_USERNAME = os.getenv("VEEDRIVE_DB_USERNAME")
