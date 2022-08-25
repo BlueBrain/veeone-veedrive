@@ -39,8 +39,13 @@ async def setup_db():
         await conn.execute(
             "CREATE TABLE IF NOT EXISTS public.archived_presentations (id SERIAL NOT NULL, data jsonb NOT NULL, CONSTRAINT archived_presentation_pkey PRIMARY KEY (id))"
         )
+        await conn.execute(
+            "CREATE TABLE IF NOT EXISTS public.folders (name VARCHAR NOT NULL, PRIMARY KEY (name))"
+        )
+
         await conn.execute(f"DELETE from presentations;")
         await conn.execute(f"DELETE from archived_presentations;")
+        await conn.execute(f"DELETE from folders;")
 
     if config.DB_TYPE == "mongo":
         mongo_client = pymongo.MongoClient(config.DB_HOST, config.DB_PORT)
