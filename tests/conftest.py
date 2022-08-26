@@ -59,6 +59,9 @@ def testing_backend(request):
 
 def start_server(verbose=False):
     global server
+    sandbox_test_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sandbox_folder")
+    os.environ["VEEDRIVE_MEDIA_PATH"] = sandbox_test_folder
+
     print("VEEDRIVE_MEDIA_PATH configured as:", os.getenv("VEEDRIVE_MEDIA_PATH"))
     if verbose:
         server = subprocess.Popen(["python3", "-m", "veedrive.main"])
@@ -66,6 +69,7 @@ def start_server(verbose=False):
         server = subprocess.Popen(
             ["python3", "-m", "veedrive.main"], stdout=FNULL, stderr=FNULL
         )
+    config.THUMBNAIL_CACHE_PATH = os.path.join(config.SANDBOX_PATH, "cache")
     time.sleep(2)
 
 
