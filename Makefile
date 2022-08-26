@@ -19,6 +19,9 @@ run-docker-tests:
 run-docker-dev:
 	HOST_VEEDRIVE_MEDIA_PATH=`pwd`/tests/sandbox_folder docker compose  -f docker-compose.yml -f docker-compose-dev.yml up
 
+run-openstack-prod:
+	docker-compose -f docker-compose.yml -f docker-compose-openstack.yml up
+
 install-dev:
 	pip install -e .
 

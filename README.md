@@ -51,12 +51,14 @@ deploy$ ./update_hostname.sh
 ### SSL set-up
 Make sure you have certificates in `/etc/letsencrypt/live/${HOSTNAME}`. fullchain.pem and privkey.pem are required.
 
-### Openstack VM
+### Openstack VM details
 More on running Veedrive in Openstack VM in deploy/README.md
 
 ### Run 
 ```
-$ docker-compose up -d
+$ docker-compose -f docker-compose.yml -f docker-compose-openstack.yml up
+  or
+make run-openstack-prod
 ```
 
 ### Volume trick
