@@ -14,7 +14,7 @@ services:
       - VEEDRIVE_DB_NAME=veedrive_prod
       - VEEDRIVE_DB_HOST=postgresql14-users.bbp.epfl.ch
       - VEEDRIVE_DB_USERNAME=veedrive_prod
-      - VEEDRIVE_DB_PASSWORD=REPLACE_ME
+      - VEEDRIVE_DB_PASSWORD=${VEEDRIVE_DB_PASSWORD}
       - HTTP_PROXY=http://bbpproxy.epfl.ch:80/
   nginx:
     restart: always

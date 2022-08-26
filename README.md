@@ -58,7 +58,7 @@ More on running Veedrive in Openstack VM in deploy/README.md
 ```
 $ docker-compose -f docker-compose.yml -f docker-compose-openstack.yml up
   or
-make run-openstack-prod
+$ make run-openstack-prod
 ```
 
 ### Volume trick
