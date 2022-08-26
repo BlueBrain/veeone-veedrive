@@ -8,4 +8,4 @@ services:
       - VEEDRIVE_ORIGIN_WHITELIST=127.0.0.1,10.80.13.24,10.80.13.25,10.80.13.26,10.80.13.30
       - PYTHONUNBUFFERED=1
     volumes:
-      - ${HOST_VEEDRIVE_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media
+      - ${HOST_MEDIA_PATH:-/nfs4/bbp.epfl.ch/media/DisplayWall}:/media
