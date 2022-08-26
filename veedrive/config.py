@@ -5,7 +5,11 @@ import pytz
 DEFAULT_HOST = os.getenv("VEEDRIVE_DEFAULT_HOST", "0.0.0.0")
 DEFAULT_PORT = os.getenv("VEEDRIVE_DEFAULT_PORT", 4444)
 
-SANDBOX_PATH = os.path.normpath(os.getenv("VEEDRIVE_MEDIA_PATH", "/media"))
+
+default_sandbox_folder = os.path.abspath(
+    os.path.join(os.path.dirname(__file__),"..",  "tests", "sandbox_folder"))
+
+SANDBOX_PATH = os.path.normpath(os.getenv("VEEDRIVE_MEDIA_PATH", default_sandbox_folder))
 THUMBNAIL_CACHE_PATH = os.path.join(SANDBOX_PATH, "cache")
 
 STATIC_CONTENT_URL = os.getenv(

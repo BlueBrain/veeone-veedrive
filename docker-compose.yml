@@ -5,6 +5,7 @@ services:
     user: ${BACKEND_USER}
     image: bbpgitlab.epfl.ch:5050/viz/veeone/veedrive
     environment:
+      - VEEDRIVE_MEDIA_PATH=/media
       - VEEDRIVE_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/content
       - VEEDRIVE_STATIC_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/static
       - VEEDRIVE_ENVIRONMENT=prod

@@ -8,36 +8,32 @@ from ... import config
 from ...utils.exceptions import WrongObjectType
 from .. import content_manager, fs_manager
 
-sandboxpath = os.path.abspath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "tests", "sandbox_folder"))
-config.SANDBOX_PATH = sandboxpath
-
 
 class TestPath(unittest.TestCase):
     def test_exceptions(self):
         with self.assertRaises(PermissionError):
             fs_manager.validate_path("/tmp", "dir")
         with self.assertRaises(PermissionError):
-            fs_manager.validate_path(os.path.join(sandboxpath, "../../"), "dir")
+            fs_manager.validate_path(os.path.join(config.SANDBOX_PATH, "../../"), "dir")
         with self.assertRaises(PermissionError):
-            fs_manager.validate_path(os.path.join(sandboxpath, "/../"), "file")
+            fs_manager.validate_path(os.path.join(config.SANDBOX_PATH, "/../"), "file")
         with self.assertRaises(PermissionError):
-            fs_manager.validate_path(os.path.join(sandboxpath, "../"), "file")
+            fs_manager.validate_path(os.path.join(config.SANDBOX_PATH, "../"), "file")
         with self.assertRaises(PermissionError):
-            fs_manager.validate_path(os.path.join(sandboxpath, "/"), "file")
+            fs_manager.validate_path(os.path.join(config.SANDBOX_PATH, "/"), "file")
 
         with self.assertRaises(FileNotFoundError):
             fs_manager.validate_path(
-                os.path.join(sandboxpath, "folder1", "file_not_exisiting"),
+                os.path.join(config.SANDBOX_PATH, "folder1", "file_not_exisiting"),
                 "file",
             )
         with self.assertRaises(WrongObjectType):
             fs_manager.validate_path(
-                os.path.join(sandboxpath, "folder1"), "file"
+                os.path.join(config.SANDBOX_PATH, "folder1"), "file"
             )
         with self.assertRaises(WrongObjectType):
             fs_manager.validate_path(
-                os.path.join(sandboxpath, "folder1", "file1"), "dir"
+                os.path.join(config.SANDBOX_PATH, "folder1", "file1"), "dir"
             )
 
 
@@ -65,11 +61,11 @@ class TestContentOptimization(unittest.TestCase):
     def test_portait_image(self):
         file_name = "NeuronGroup.jpg"
         img = cv2.imread(
-            os.path.join(sandboxpath, file_name), cv2.IMREAD_UNCHANGED
+            os.path.join(config.SANDBOX_PATH, file_name), cv2.IMREAD_UNCHANGED
         )
 
         optimized = content_manager.optimize_image(
-            file_name, sandboxpath, self.cache_folder, 4096, 4096
+            file_name, config.SANDBOX_PATH, self.cache_folder, 4096, 4096
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
 
@@ -83,7 +79,7 @@ class TestContentOptimization(unittest.TestCase):
         os.remove(os.path.join(self.cache_folder, file_name))
 
         optimized = content_manager.optimize_image(
-            file_name, sandboxpath, self.cache_folder, 4096, 512
+            file_name, config.SANDBOX_PATH, self.cache_folder, 4096, 512
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
         self.check_aspect(img, optimized)
@@ -95,7 +91,7 @@ class TestContentOptimization(unittest.TestCase):
         os.remove(os.path.join(self.cache_folder, file_name))
 
         optimized = content_manager.optimize_image(
-            file_name, sandboxpath, self.cache_folder, 120, 512
+            file_name, config.SANDBOX_PATH, self.cache_folder, 120, 512
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
         self.check_aspect(img, optimized)
@@ -107,11 +103,11 @@ class TestContentOptimization(unittest.TestCase):
     def test_landscape_image(self):
         file_name = "HorizontalGroup.jpg"
         img = cv2.imread(
-            os.path.join(sandboxpath, file_name), cv2.IMREAD_UNCHANGED
+            os.path.join(config.SANDBOX_PATH, file_name), cv2.IMREAD_UNCHANGED
         )
 
         optimized = content_manager.optimize_image(
-            file_name, sandboxpath, self.cache_folder, 4096, 4096
+            file_name, config.SANDBOX_PATH, self.cache_folder, 4096, 4096
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
         self.check_aspect(img, optimized)
@@ -123,7 +119,7 @@ class TestContentOptimization(unittest.TestCase):
         os.remove(os.path.join(self.cache_folder, file_name))
 
         optimized = content_manager.optimize_image(
-            file_name, sandboxpath, self.cache_folder, 4096, 512
+            file_name, config.SANDBOX_PATH, self.cache_folder, 4096, 512
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
         self.check_aspect(img, optimized)
@@ -135,7 +131,7 @@ class TestContentOptimization(unittest.TestCase):
         os.remove(os.path.join(self.cache_folder, file_name))
 
         optimized = content_manager.optimize_image(
-            file_name, sandboxpath, self.cache_folder, 512, 120
+            file_name, config.SANDBOX_PATH, self.cache_folder, 512, 120
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
         self.check_aspect(img, optimized, float_precision=1)
@@ -146,10 +142,10 @@ class TestContentOptimization(unittest.TestCase):
 
     def test_image_with_size_smaller_than_box(self):
         path = "chess.jpg"
-        img = cv2.imread(os.path.join(sandboxpath, path), cv2.IMREAD_UNCHANGED)
+        img = cv2.imread(os.path.join(config.SANDBOX_PATH, path), cv2.IMREAD_UNCHANGED)
 
         optimized = content_manager.optimize_image(
-            path, sandboxpath, self.cache_folder, 4096, 4096
+            path, config.SANDBOX_PATH, self.cache_folder, 4096, 4096
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
 
@@ -158,9 +154,9 @@ class TestContentOptimization(unittest.TestCase):
 
         os.remove(os.path.join(self.cache_folder, path))
 
-        img = cv2.imread(os.path.join(sandboxpath, path), cv2.IMREAD_UNCHANGED)
+        img = cv2.imread(os.path.join(config.SANDBOX_PATH, path), cv2.IMREAD_UNCHANGED)
         optimized = content_manager.optimize_image(
-            path, sandboxpath, self.cache_folder, 4096, 500
+            path, config.SANDBOX_PATH, self.cache_folder, 4096, 500
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
 
@@ -169,10 +165,10 @@ class TestContentOptimization(unittest.TestCase):
 
     def test_square_image(self):
         path = "chess.jpg"
-        img = cv2.imread(os.path.join(sandboxpath, path), cv2.IMREAD_UNCHANGED)
+        img = cv2.imread(os.path.join(config.SANDBOX_PATH, path), cv2.IMREAD_UNCHANGED)
 
         optimized = content_manager.optimize_image(
-            path, sandboxpath, self.cache_folder, 512, 512
+            path, config.SANDBOX_PATH, self.cache_folder, 512, 512
         )
         optimized = cv2.imread(str(optimized), cv2.IMREAD_UNCHANGED)
 
