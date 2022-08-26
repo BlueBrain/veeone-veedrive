@@ -12,22 +12,21 @@ venv:
 
 run-docker-tests:
 	docker compose build
-	HOST_VEEDRIVE_MEDIA_PATH=`pwd`/tests/sandbox_folder \
-		docker compose -f docker-compose.yml  -f docker-compose-dev.yml run  --service-ports --rm backend -m pytest --cov=veedrive -s -v
+	docker compose run  --service-ports --rm backend -m pytest --cov=veedrive -s -v
 	docker compose down
 
 run-docker-dev:
-	HOST_VEEDRIVE_MEDIA_PATH=`pwd`/tests/sandbox_folder docker compose  -f docker-compose.yml -f docker-compose-dev.yml up
+	docker compose up
 
 prep-hostname:
 	cd deploy; ./update_hostname.sh
 
 openstack-up:
 	make prep-hostname
-	docker-compose -f docker-compose.yml -f docker-compose-openstack.yml up -d
+	docker-compose up -d
 
 openstack-down:
-	docker-compose -f docker-compose.yml -f docker-compose-openstack.yml down
+	docker-compose down
 
 install-dev:
 	pip install -e .
