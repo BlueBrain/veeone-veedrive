@@ -5,9 +5,11 @@ services:
     ports:
       - "4444:4444"
     environment:
+      - HTTP_PROXY=
       - VEEDRIVE_MEDIA_PATH=/app/tests/sandbox_folder
       - VEEDRIVE_STATIC_CONTENT_URL=http://localhost:4444/static
       - VEEDRIVE_CONTENT_URL=http://localhost:4444/content
+      - VEEDRIVE_SEARCH_FS_PURGE_LOOP_INTERVAL=5
       - VEEDRIVE_DB_HOST=postgres
       - VEEDRIVE_DB_NAME=postgres
       - VEEDRIVE_DB_USERNAME=postgres

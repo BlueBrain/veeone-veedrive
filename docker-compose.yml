@@ -3,7 +3,7 @@ version: "3"
 services:
   backend:
     user: ${BACKEND_USER}
-    image: bbpgitlab.epfl.ch:5050/viz/veeone/veedrive
+    image: bbpgitlab.epfl.ch:5050/viz/veeone/veedrive:${VEEDRIVE_IMAGE_TAG:-latest}
     environment:
       - VEEDRIVE_MEDIA_PATH=/media
       - VEEDRIVE_CONTENT_URL=https://${HOSTNAME}:${PUBLIC_PORT}/content

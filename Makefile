@@ -12,11 +12,8 @@ venv:
 
 run-docker-tests:
 	docker compose build
-	docker compose run  --service-ports --rm backend -m pytest --cov=veedrive -s -v
+	docker compose run  --service-ports --rm backend -m pytest --cov=veedrive -s -v tests/test_content.py::test_get_image
 	docker compose down
-
-run-docker-dev:
-	docker compose up
 
 prep-hostname:
 	cd deploy; ./update_hostname.sh
