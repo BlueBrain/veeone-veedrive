@@ -6,9 +6,13 @@ All notable changes to this project will be documented in this file.
 - Sentry integration
 - PostgreSQL support
 - Support for filtering presentations by "folder"
+- Presentations folder API 
 
 ### Changed
 - Simplify logging
+
+### Removed
+- Mongodb support
 
 ## [0.2.0] - 2022-03-03
 ### Added

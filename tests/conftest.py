@@ -5,7 +5,6 @@ import signal
 import subprocess
 import time
 
-import pymongo
 import pytest
 import websockets
 from asyncpg import connect
@@ -26,25 +25,25 @@ def event_loop():
 
 @pytest.fixture(scope="module")
 async def setup_db():
-    if config.DB_TYPE == "postgres":
-        conn = await connect(
-            database="postgres",
-            user="postgres",
-            host="localhost",
-            password="postgres",
-        )
-        await conn.execute(
-            "CREATE TABLE IF NOT EXISTS public.presentations (id SERIAL NOT NULL, data jsonb NOT NULL,  CONSTRAINT presentation_pkey PRIMARY KEY (id))"
-        )
-        await conn.execute(
-            "CREATE TABLE IF NOT EXISTS public.archived_presentations (id SERIAL NOT NULL, data jsonb NOT NULL, CONSTRAINT archived_presentation_pkey PRIMARY KEY (id))"
-        )
-        await conn.execute(f"DELETE from presentations;")
-        await conn.execute(f"DELETE from archived_presentations;")
+    conn = await connect(
+        database=config.DB_NAME,
+        user=config.DB_USERNAME,
+        host=config.DB_HOST,
+        password=config.DB_PASSWORD,
+    )
+    await conn.execute(
+        "CREATE TABLE IF NOT EXISTS public.presentations (id SERIAL NOT NULL, data jsonb NOT NULL,  CONSTRAINT presentation_pkey PRIMARY KEY (id))"
+    )
+    await conn.execute(
+        "CREATE TABLE IF NOT EXISTS public.archived_presentations (id SERIAL NOT NULL, data jsonb NOT NULL, CONSTRAINT archived_presentation_pkey PRIMARY KEY (id))"
+    )
+    await conn.execute(
+        "CREATE TABLE IF NOT EXISTS public.folders (name VARCHAR NOT NULL, PRIMARY KEY (name))"
+    )
 
-    if config.DB_TYPE == "mongo":
-        mongo_client = pymongo.MongoClient(config.DB_HOST, config.DB_PORT)
-        mongo_client.drop_database(config.DB_NAME)
+    await conn.execute(f"DELETE from presentations;")
+    await conn.execute(f"DELETE from archived_presentations;")
+    await conn.execute(f"DELETE from folders;")
 
 
 @pytest.fixture(scope="session")
@@ -60,6 +59,11 @@ def testing_backend(request):
 
 def start_server(verbose=False):
     global server
+    sandbox_test_folder = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "sandbox_folder"
+    )
+    os.environ["VEEDRIVE_MEDIA_PATH"] = sandbox_test_folder
+
     print("VEEDRIVE_MEDIA_PATH configured as:", os.getenv("VEEDRIVE_MEDIA_PATH"))
     if verbose:
         server = subprocess.Popen(["python3", "-m", "veedrive.main"])
@@ -67,6 +71,7 @@ def start_server(verbose=False):
         server = subprocess.Popen(
             ["python3", "-m", "veedrive.main"], stdout=FNULL, stderr=FNULL
         )
+    config.THUMBNAIL_CACHE_PATH = os.path.join(config.SANDBOX_PATH, "cache")
     time.sleep(2)
 
 

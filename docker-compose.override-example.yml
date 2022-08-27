@@ -1,0 +1,29 @@
+version: "3"
+services:
+  backend:
+    build: .
+    ports:
+      - "4444:4444"
+    environment:
+      - HTTP_PROXY=
+      - VEEDRIVE_MEDIA_PATH=/app/tests/sandbox_folder
+      - VEEDRIVE_STATIC_CONTENT_URL=http://localhost:4444/static
+      - VEEDRIVE_CONTENT_URL=http://localhost:4444/content
+      - VEEDRIVE_SEARCH_FS_PURGE_LOOP_INTERVAL=5
+      - VEEDRIVE_DB_HOST=postgres
+      - VEEDRIVE_DB_NAME=postgres
+      - VEEDRIVE_DB_USERNAME=postgres
+      - VEEDRIVE_DB_PASSWORD=example
+# Ucomment to load src into /app folder (careful, it can override files from image)
+#    volumes:
+#      - .:/app
+    depends_on:
+      - postgres
+  postgres:
+    restart: always
+    image: "postgres:14"
+    environment:
+      - POSTGRES_PASSWORD=example
+  nginx:
+    command: 'echo ### Exititing because of docker composer override ###'
+    restart: "no"

@@ -78,6 +78,24 @@ class PgConnector(DBInterface):
         sql_string = f"DELETE from presentations;"
         return await self.conn.execute(sql_string)
 
+    async def create_folder(self, folder_name: str):
+        sql_string = f"INSERT INTO folders(name) VALUES ('{folder_name}') ;"
+        try:
+            await self.conn.execute(sql_string)
+        except asyncpg.exceptions.UniqueViolationError:
+            raise Exception("Folder already exists")
+
+    async def remove_folder(self, folder_name: str):
+        sql_string = f"DELETE FROM folders where name = '{folder_name}' RETURNING * ;"
+        res = await self.conn.fetchval(sql_string)
+        if not res:
+            raise Exception("Specified folder does not exist")
+
+    async def list_folders(self):
+        sql_string = f"SELECT name from folders;"
+        results = await self.conn.fetch(sql_string)
+        return [(result[0]) for result in results]
+
     async def _archive_presentation(self, presentation_data: dict):
         sql_string = f"INSERT INTO archived_presentations (data) VALUES ('{json.dumps(presentation_data)}') RETURNING id;"
         return await self.conn.execute(sql_string)

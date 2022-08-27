@@ -103,6 +103,12 @@ async def process_request(data):
         return await presentation_handler.delete_presentation(data)
     elif method == "PurgePresentations":
         return await presentation_handler.purge_presentations(data)
+    elif method == "ListFolders":
+        return await presentation_handler.list_folders(data)
+    elif method == "CreateFolder":
+        return await presentation_handler.create_folder(data)
+    elif method == "RemoveFolder":
+        return await presentation_handler.remove_folder(data)
     # Method not defined
     else:
         return jsonrpc.prepare_error(data, 404, "Method not defined")

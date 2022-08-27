@@ -83,3 +83,55 @@ async def delete_presentation(data):
 async def purge_presentations(data):
     await (await db_manager.get_db()).purge_presentations()
     return jsonrpc.prepare_response(data, "OK")
+
+
+async def create_folder(data):
+    """Handler for CreateFolder JSON-RPC method.
+
+    :param data: JSON-RPC object
+    :type data: dict
+    :return: JSON-RPC object
+    :rtype: dict
+    """
+    folder_name = data["params"]["folder_name"]
+    try:
+        await (await db_manager.get_db()).create_folder(folder_name)
+        return jsonrpc.prepare_response(data, "OK")
+    except Exception as e:
+        return jsonrpc.prepare_error(data, 701, str(e))
+
+
+async def remove_folder(data):
+    """Handler for RemoveFolder JSON-RPC method.
+
+    :param data: JSON-RPC object
+    :type data: dict
+    :return: JSON-RPC object
+    :rtype: dict
+    """
+    folder_name = data["params"]["folder_name"]
+
+    presentation_list = await (await db_manager.get_db()).list_presentations(
+        folder_name
+    )
+    if presentation_list:
+        return jsonrpc.prepare_error(
+            data, 403, "Cannot remove, folder contains presentations"
+        )
+    try:
+        await (await db_manager.get_db()).remove_folder(folder_name)
+        return jsonrpc.prepare_response(data, "OK")
+    except Exception as e:
+        return jsonrpc.prepare_error(data, 400, str(e))
+
+
+async def list_folders(data):
+    """Handler for ListFolders JSON-RPC method.
+
+    :param data: JSON-RPC object
+    :type data: dict
+    :return: JSON-RPC object
+    :rtype: dict
+    """
+    folder_list = await (await db_manager.get_db()).list_folders()
+    return jsonrpc.prepare_response(data, folder_list)
