@@ -161,7 +161,6 @@ async def test_folder_listing(testing_backend, setup_db):
     request_payload = {
         "method": "ListFolders",
         "id": "1",
-
     }
     response_load = await testing_backend.send_ws(request_payload)
     assert response_load["result"] == ["folder1", "folder2"]
@@ -175,7 +174,10 @@ async def test_folder_deletion(testing_backend, setup_db):
         "params": {"folder_name": "folder1"},
     }
     response_load = await testing_backend.send_ws(request_payload)
-    assert response_load["error"]["message"] == "Cannot remove, folder contains presentations"
+    assert (
+        response_load["error"]["message"]
+        == "Cannot remove, folder contains presentations"
+    )
 
     request_payload["params"] = {"folder_name": "folder2"}
     response_load = await testing_backend.send_ws(request_payload)

@@ -26,9 +26,9 @@ def transform_image(img: numpy.ndarray, box_width, box_height, scaling_mode, ext
     image_height, image_width = img.shape[:2]
     image_aspect = image_width / image_height
 
-    image_smaller_than_box = (
-        image_aspect > 1.0 and box_width >= image_width
-    ) or (image_aspect <= 1.0 and box_height >= image_height)
+    image_smaller_than_box = (image_aspect > 1.0 and box_width >= image_width) or (
+        image_aspect <= 1.0 and box_height >= image_height
+    )
     if image_smaller_than_box:
         return _encode_image(img, ext)
 
@@ -77,7 +77,9 @@ def _resize(img: numpy.ndarray, box_width, box_height):
         logging.error(f"ERORR: {str(e)}")
 
 
-def _resize_to_fit(img: numpy.ndarray, image_width, image_height, box_width, box_height):
+def _resize_to_fit(
+    img: numpy.ndarray, image_width, image_height, box_width, box_height
+):
     requested_aspect = box_width / box_height
     image_aspect = image_width / image_height
 
@@ -97,7 +99,9 @@ def _resize_to_fit(img: numpy.ndarray, image_width, image_height, box_width, box
     return cv2.resize(img, requested_aspect, interpolation=cv2.INTER_AREA)
 
 
-def _resize_to_fill(img: numpy.ndarray, image_width, image_height, box_width, box_height):
+def _resize_to_fill(
+    img: numpy.ndarray, image_width, image_height, box_width, box_height
+):
     """fill the specified box with the output (cropping possible)"""
 
     ratio = max(box_width / image_width, box_height / image_height)

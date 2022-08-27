@@ -96,7 +96,7 @@ async def create_folder(data):
     folder_name = data["params"]["folder_name"]
     try:
         await (await db_manager.get_db()).create_folder(folder_name)
-        return jsonrpc.prepare_response(data, 'OK')
+        return jsonrpc.prepare_response(data, "OK")
     except Exception as e:
         return jsonrpc.prepare_error(data, 701, str(e))
 
@@ -111,12 +111,16 @@ async def remove_folder(data):
     """
     folder_name = data["params"]["folder_name"]
 
-    presentation_list = await (await db_manager.get_db()).list_presentations(folder_name)
+    presentation_list = await (await db_manager.get_db()).list_presentations(
+        folder_name
+    )
     if presentation_list:
-        return jsonrpc.prepare_error(data, 403, "Cannot remove, folder contains presentations")
+        return jsonrpc.prepare_error(
+            data, 403, "Cannot remove, folder contains presentations"
+        )
     try:
         await (await db_manager.get_db()).remove_folder(folder_name)
-        return jsonrpc.prepare_response(data, 'OK')
+        return jsonrpc.prepare_response(data, "OK")
     except Exception as e:
         return jsonrpc.prepare_error(data, 400, str(e))
 
