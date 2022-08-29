@@ -48,7 +48,7 @@ class PgConnector(DBInterface):
         folder_filter_string = (
             f"WHERE data::jsonb ->> 'folder' = '{folder}'"
             if folder
-            else "WHERE NOT data ::jsonb ? 'folder' "
+            else "WHERE NOT data ::jsonb ? 'folder' OR data::jsonb ->> 'folder' IS NULL "
         )
         sql_string = f"SELECT data ::jsonb FROM presentations {folder_filter_string} \
                        ORDER BY data ::jsonb ->> 'savedAt' DESC LIMIT 1000;"
