@@ -21,7 +21,7 @@ requirements = parse_reqs(os.path.join(BASEDIR, "requirements.txt"))
 
 setup(
     name="veedrive",
-    version="0.2",
+    version="0.3",
     description="Media serving and presentation persistence service for VeeOne",
     author="Pawel Podhajski",
     author_email="pawel.podhajski@epfl.ch",
