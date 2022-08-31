@@ -1,12 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.3.0] - 2022-08-31
 ### Added
 - Sentry integration
 - PostgreSQL support
 - Support for filtering presentations by "folder"
-- Presentations folder API 
+- Presentations folder API
 
 ### Changed
 - Simplify logging
@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 ## [0.1.0] - 2021-03-30
 -  Presentation and content APIs
 
-[Unreleased]: https://bbpgitlab.epfl.ch/viz/veeone/veedrive/-/compare/0.2.0...master?from_project_id=124
+[Unreleased]: https://bbpgitlab.epfl.ch/viz/veeone/veedrive/-/compare/0.3.0...master?from_project_id=124
+[0.3.0]: https://bbpgitlab.epfl.ch/viz/veeone/veedrive/-/compare/0.2.0...0.3.0?from_project_id=124
 [0.2.0]: https://bbpgitlab.epfl.ch/viz/veeone/veedrive/-/compare/0.1.0...0.2.0?from_project_id=124
 [0.1.0]: https://bbpgitlab.epfl.ch/viz/veeone/veedrive/-/compare/e7c9bc69247b67440166d754738c0ccc42d55cbb...0.1.0?from_project_id=124
