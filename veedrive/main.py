@@ -54,6 +54,7 @@ async def start_app():
     app.router.add_routes(
         [
             web.get("/ws", server.handle_ws),
+            web.get("/config", server.handle_config_request),
             web.get("/content/thumb/{path:[^{}]+}", server.handle_thumbnail_request),
             web.get(
                 "/content/scaled/{path:[^{}]+}", server.handle_scaled_image_request
