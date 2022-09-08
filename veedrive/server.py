@@ -195,6 +195,21 @@ async def handle_scaled_image_request(request):
         raise HTTPInternalServerError()
 
 
+async def handle_config_request(request):
+    """Configuration enumeration endpoint handler
+
+    :param request: request
+    :type request: class: `aiohttp.web.BaseRequest`
+    :return: 200 status code
+    :rtype: class: `aiohttp.web.Response`
+    """
+
+    configuration = {}
+    for key in config.EXPOSED_CONFIG_KEYS:
+        configuration[key] = getattr(config, key)
+    return web.Response(body=json.dumps(configuration), content_type="application/json")
+
+
 async def authorized(request):
     """Authentication status endpoint handler.
     If a request hasn't been rejected by a middleware it means

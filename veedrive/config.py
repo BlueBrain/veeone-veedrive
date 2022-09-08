@@ -47,6 +47,7 @@ if os.getenv("VEEDRIVE_ORIGIN_WHITELIST", None):
     ORIGIN_WHITELIST = os.environ["VEEDRIVE_ORIGIN_WHITELIST"].split(",")
 else:
     ORIGIN_WHITELIST = ["127.0.0.1"]
+EXPOSED_CONFIG_KEYS = ["ENVIRONMENT", "SANDBOX_PATH"]
 
 # Constants.  Don't change!
 
