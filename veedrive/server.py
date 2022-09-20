@@ -5,6 +5,7 @@ import os.path
 from concurrent.futures import ProcessPoolExecutor
 
 import aiohttp
+import asyncpg
 import cv2
 from aiohttp import web
 from aiohttp.web import (HTTPBadRequest, HTTPForbidden,
@@ -40,36 +41,28 @@ async def handle_ws(request):
                     response = await process_request(data)
                 except KeyError as e:
                     await ws.send_str(
-                        str(
-                            jsonrpc.prepare_error(
-                                data, config.MALFORMED_REQUEST, "Malformed"
-                            )
+                        jsonrpc.prepare_error(
+                            data, config.MALFORMED_REQUEST, "Malformed"
                         )
                     )
                 except CodeException as e:
-                    await ws.send_str(str(jsonrpc.prepare_error_code(data, e)))
+                    await ws.send_str(jsonrpc.prepare_error_code(data, e))
                 except PermissionError as e:
                     await ws.send_str(
-                        str(
-                            jsonrpc.prepare_error(
-                                data, config.PERMISSION_DENIED, str(e)
-                            )
-                        )
+                        jsonrpc.prepare_error(data, config.PERMISSION_DENIED, str(e))
                     )
                 except FileNotFoundError as e:
                     await ws.send_str(
-                        str(jsonrpc.prepare_error(data, config.PATH_NOT_FOUND, str(e)))
+                        jsonrpc.prepare_error(data, config.PATH_NOT_FOUND, str(e))
                     )
                 except WrongObjectType as e:
                     await ws.send_str(
-                        str(
-                            jsonrpc.prepare_error(
-                                data, config.WRONG_FILE_TYPE_REQUESTED, str(e)
-                            )
+                        jsonrpc.prepare_error(
+                            data, config.WRONG_FILE_TYPE_REQUESTED, str(e)
                         )
                     )
 
-                await ws.send_str(str(response))
+                await ws.send_str(response)
 
         elif msg.type == aiohttp.WSMsgType.ERROR:
             logging.error(f"ws connection closed with exception {ws.exception()}")
@@ -91,27 +84,31 @@ async def process_request(data):
         return await content_handler.get_search_result(data)
 
     # Scene
-    elif method == "ListPresentations":
-        return await presentation_handler.list_presentations(data)
-    elif method == "GetPresentation":
-        return await presentation_handler.get_presentation(data)
-    elif method == "SavePresentation":
-        return await presentation_handler.save_presentation(data)
-    elif method == "PresentationVersions":
-        return await presentation_handler.list_scene_versions(data)
-    elif method == "DeletePresentation":
-        return await presentation_handler.delete_presentation(data)
-    elif method == "PurgePresentations":
-        return await presentation_handler.purge_presentations(data)
-    elif method == "ListFolders":
-        return await presentation_handler.list_folders(data)
-    elif method == "CreateFolder":
-        return await presentation_handler.create_folder(data)
-    elif method == "RemoveFolder":
-        return await presentation_handler.remove_folder(data)
+    try:
+        if method == "ListPresentations":
+            return await presentation_handler.list_presentations(data)
+        elif method == "GetPresentation":
+            return await presentation_handler.get_presentation(data)
+        elif method == "SavePresentation":
+            return await presentation_handler.save_presentation(data)
+        elif method == "PresentationVersions":
+            return await presentation_handler.list_scene_versions(data)
+        elif method == "DeletePresentation":
+            return await presentation_handler.delete_presentation(data)
+        elif method == "PurgePresentations":
+            return await presentation_handler.purge_presentations(data)
+        elif method == "ListFolders":
+            return await presentation_handler.list_folders(data)
+        elif method == "CreateFolder":
+            return await presentation_handler.create_folder(data)
+        elif method == "RemoveFolder":
+            return await presentation_handler.remove_folder(data)
+    except (asyncpg.exceptions.PostgresError, ConnectionRefusedError) as e:
+        logging.critical(f"{type(e).__name__}: {e}")
+        return jsonrpc.prepare_error(data, 999, "DB_ISSUE")
+
     # Method not defined
-    else:
-        return jsonrpc.prepare_error(data, 404, "Method not defined")
+    return jsonrpc.prepare_error(data, 404, "Method not defined")
 
 
 async def handle_thumbnail_request(request):
@@ -168,9 +165,6 @@ async def handle_thumbnail_request(request):
     except cv2.error as e:
         logging.error(e)
         raise HTTPInternalServerError(reason="Opencv cannot handle this request")
-    except Exception:
-        raise
-        raise HTTPInternalServerError
 
 
 async def handle_scaled_image_request(request):

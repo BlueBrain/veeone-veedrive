@@ -6,6 +6,7 @@ services:
       - "4444:4444"
     environment:
       - HTTP_PROXY=
+      - VEEDRIVE_ENVIRONMENT=prod
       - VEEDRIVE_MEDIA_PATH=/app/tests/sandbox_folder
       - VEEDRIVE_STATIC_CONTENT_URL=http://localhost:4444/static
       - VEEDRIVE_CONTENT_URL=http://localhost:4444/content

@@ -4,7 +4,7 @@ import logging
 
 from aiohttp import web
 
-from . import config, server
+from . import config, healthcheck, server
 from .content import fs_manager, utils
 from .utils import logger, sentry
 
@@ -55,6 +55,7 @@ async def start_app():
         [
             web.get("/ws", server.handle_ws),
             web.get("/config", server.handle_config_request),
+            web.get("/healthcheck", healthcheck.handle_healthcheck),
             web.get("/content/thumb/{path:[^{}]+}", server.handle_thumbnail_request),
             web.get(
                 "/content/scaled/{path:[^{}]+}", server.handle_scaled_image_request
@@ -70,7 +71,7 @@ async def start_app():
     utils.create_cache_subfolders(config.THUMBNAIL_CACHE_PATH)
 
     tcp_site = web.TCPSite(app_runner, args.address, args.port)
-    logging.error(f"application server running at: {args.address}:{args.port}")
+    logging.info(f"application server running at: {args.address}:{args.port}")
     await tcp_site.start()
     return app_runner, tcp_site
 
