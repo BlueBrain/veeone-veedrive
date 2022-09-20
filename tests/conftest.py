@@ -83,9 +83,9 @@ def kill_server():
 
 class TestHelper:
     @staticmethod
-    async def send_ws(payload):
+    async def send_ws(payload, endpoint="ws"):
         async with websockets.connect(
-            f"ws://{config.DEFAULT_HOST}:{config.DEFAULT_PORT}/ws"
+            f"ws://{config.DEFAULT_HOST}:{config.DEFAULT_PORT}/{endpoint}"
         ) as websocket:
             await websocket.send(json.dumps(payload))
             response = await websocket.recv()
