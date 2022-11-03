@@ -62,10 +62,14 @@ async def save_presentation(data):
     :rtype: dict
     """
     presentation_data = data["params"]
-    inserted_id: str = await (await db_manager.get_db()).save_presentation_to_storage(
-        presentation_data
-    )
-    return jsonrpc.prepare_response(data, "ok")
+    try:
+        await (await db_manager.get_db()).save_presentation_to_storage(
+            presentation_data
+        )
+        return jsonrpc.prepare_response(data, "ok")
+
+    except Exception as e:
+        return jsonrpc.prepare_error_code(data, e)
 
 
 async def delete_presentation(data):

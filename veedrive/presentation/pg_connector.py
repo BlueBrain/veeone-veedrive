@@ -26,13 +26,20 @@ class PgConnector(DBInterface):
             password=config.DB_PASSWORD,
         )
 
-    async def get_presentation(self, presentation_id: str):
-        presentation_id = uuid.UUID(presentation_id)
-        sql_string = f"SELECT data ::jsonb FROM presentations WHERE data ::jsonb ->> 'id' = '{presentation_id}';"
-
+    async def get_presentation(self, presentation_id: str = None, presentation_name: str = None, presentation_folder: str = None,
+    ):
+        sql_base = "SELECT data ::jsonb FROM presentations"
+        if presentation_id:
+            presentation_id = uuid.UUID(presentation_id)
+            sql_string = f"{sql_base} WHERE data ::jsonb ->> 'id' = '{presentation_id}';"
+        if presentation_name:
+            if presentation_folder:
+                sql_string = f"{sql_base} WHERE data ::jsonb ->> 'name' = '{presentation_name}' AND data ::jsonb ->> 'folder' = '{presentation_folder}';"
+            else:
+                sql_string = f"{sql_base} WHERE data ::jsonb ->> 'name' = '{presentation_name}' AND data ::jsonb ->> 'folder' IS NULL;"
         result = await self.conn.fetchrow(sql_string)
         if not result:
-            raise CodeException(config.PRESENTATION_NOT_FOUND, "Presentation not found")
+            return None
         else:
             return json.loads(result[0])
 
@@ -59,16 +66,26 @@ class PgConnector(DBInterface):
         return list(map(prepare_presentation_data, full_list))
 
     async def save_presentation_to_storage(self, presentation_data: dict):
-        try:
-            existing_presentation = await self.get_presentation(presentation_data["id"])
+        existing_presentation = await self.get_presentation(presentation_data["id"])
+        if existing_presentation:
+            print("existing with same ID", flush=True)
             await self._archive_presentation(existing_presentation)
             await self.delete_presentation(presentation_data["id"])
-        except CodeException as e:
-            if e.code == config.PRESENTATION_NOT_FOUND:
-                pass
-        finally:
-            sql_string = f"INSERT INTO presentations (data) VALUES ('{json.dumps(presentation_data)}') RETURNING id;"
-            return await self.conn.execute(sql_string)
+
+        if not existing_presentation:
+            existing_presentation_with_same_name = await self.get_presentation(
+                presentation_name=presentation_data["name"],
+                presentation_folder=presentation_data["folder"],
+            )
+            if existing_presentation_with_same_name:
+                print("existing with different ID and same name", flush=True)
+                raise CodeException(
+                    10,
+                    f'{presentation_data["name"]} already exists in folder: {presentation_data["folder"]}',
+                )
+
+        sql_string = f"INSERT INTO presentations (data) VALUES ('{json.dumps(presentation_data)}') RETURNING id;"
+        return await self.conn.execute(sql_string)
 
     async def delete_presentation(self, presentation_id: str):
         sql_string = f"DELETE from presentations WHERE data ::jsonb ->> 'id'  =  '{presentation_id}' ;"

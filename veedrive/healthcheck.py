@@ -43,9 +43,7 @@ async def handle_healthcheck(request):
                             await db_manager.get_db()
                         ).list_presentations()
                         folder_list = await (await db_manager.get_db()).list_folders()
-                        db_operational = (
-                            True if presentation_list or folder_list else False
-                        )
+                        db_operational = bool(presentation_list or folder_list)
                         response = {
                             "fs_ok": fs_operational,
                             "db_ok": db_operational,
