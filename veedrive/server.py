@@ -95,8 +95,6 @@ async def process_request(data):
             return await presentation_handler.list_scene_versions(data)
         elif method == "DeletePresentation":
             return await presentation_handler.delete_presentation(data)
-        elif method == "PurgePresentations":
-            return await presentation_handler.purge_presentations(data)
         elif method == "ListFolders":
             return await presentation_handler.list_folders(data)
         elif method == "CreateFolder":

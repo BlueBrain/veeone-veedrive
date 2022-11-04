@@ -88,11 +88,6 @@ async def delete_presentation(data):
     return jsonrpc.prepare_response(data, 0)
 
 
-async def purge_presentations(data):
-    await (await db_manager.get_db()).purge_presentations()
-    return jsonrpc.prepare_response(data, "OK")
-
-
 async def create_folder(data):
     """Handler for CreateFolder JSON-RPC method.
 
