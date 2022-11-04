@@ -51,7 +51,9 @@ async def handle_healthcheck(request):
                         await ws.send_str(jsonrpc.prepare_response(data, response))
                 except Exception as e:
                     await ws.send_str(
-                        jsonrpc.prepare_error(data, 13, "Issue while performing health check: " + str(e))
+                        jsonrpc.prepare_error(
+                            data, 13, "Issue while performing health check: " + str(e)
+                        )
                     )
         elif msg.type == aiohttp.WSMsgType.ERROR:
             logging.error(f"ws connection closed with exception {ws.exception()}")

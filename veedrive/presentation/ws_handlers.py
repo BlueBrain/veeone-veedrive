@@ -1,7 +1,7 @@
 from .. import config
 from ..utils import jsonrpc
-from . import db_manager
 from ..utils.exceptions import CodeException
+from . import db_manager
 
 
 async def get_presentation(data):

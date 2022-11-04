@@ -209,7 +209,8 @@ async def test_saving_presentation_with_same_name(testing_backend, setup_db):
         "id": "1",
         "params": {
             "id": "1509d5ec-163f-4a79-8942-4a8b74dbd430",
-            "name": "My presentation" },
+            "name": "My presentation",
+        },
     }
 
     response_load_1 = await testing_backend.send_ws(presentation_save_payload)
@@ -221,7 +222,8 @@ async def test_saving_presentation_with_same_name(testing_backend, setup_db):
         "params": {
             "id": "1509d5ec-163f-4a79-8942-4a8b74dbd430",
             "name": "My presentation",
-            "folder": "folder1"},
+            "folder": "folder1",
+        },
     }
     response_load_1 = await testing_backend.send_ws(presentation_save_payload)
     assert response_load_1["result"] == "ok"
