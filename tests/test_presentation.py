@@ -183,9 +183,45 @@ async def test_folder_deletion(testing_backend, setup_db):
     response_load = await testing_backend.send_ws(request_payload)
     assert response_load["result"] == "OK"
 
+    response_load = await testing_backend.send_ws(request_payload)
+    assert response_load["error"]
+
     request_payload = {
         "method": "ListFolders",
         "id": "1",
     }
     response_load = await testing_backend.send_ws(request_payload)
     assert response_load["result"] == ["folder1"]
+
+
+@pytest.mark.asyncio
+async def test_saving_presentation_with_same_name(testing_backend, setup_db):
+    presentation_save_payload = {
+        "method": "SavePresentation",
+        "id": "1",
+        "params": {"id": presentation_test_id, "name": "My presentation"},
+    }
+    response_save_1 = await testing_backend.send_ws(presentation_save_payload)
+    assert isinstance(response_save_1["result"], str)
+
+    presentation_save_payload = {
+        "method": "SavePresentation",
+        "id": "1",
+        "params": {
+            "id": "1509d5ec-163f-4a79-8942-4a8b74dbd430",
+            "name": "My presentation" },
+    }
+
+    response_load_1 = await testing_backend.send_ws(presentation_save_payload)
+    assert response_load_1["error"]["code"] == 10
+
+    presentation_save_payload = {
+        "method": "SavePresentation",
+        "id": "1",
+        "params": {
+            "id": "1509d5ec-163f-4a79-8942-4a8b74dbd430",
+            "name": "My presentation",
+            "folder": "folder1"},
+    }
+    response_load_1 = await testing_backend.send_ws(presentation_save_payload)
+    assert response_load_1["result"] == "ok"
