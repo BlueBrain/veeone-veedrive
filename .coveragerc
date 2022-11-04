@@ -4,3 +4,8 @@ source=veedrive
 [report]
 fail_under=60
 skip_empty=true
+
+exclude_lines =
+    pragma: no cover
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError

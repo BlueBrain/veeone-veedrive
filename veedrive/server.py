@@ -39,6 +39,7 @@ async def handle_ws(request):
                 data = json.loads(msg.data)
                 try:
                     response = await process_request(data)
+                    await ws.send_str(response)
                 except KeyError as e:
                     await ws.send_str(
                         jsonrpc.prepare_error(
@@ -61,9 +62,6 @@ async def handle_ws(request):
                             data, config.WRONG_FILE_TYPE_REQUESTED, str(e)
                         )
                     )
-
-                await ws.send_str(response)
-
         elif msg.type == aiohttp.WSMsgType.ERROR:
             logging.error(f"ws connection closed with exception {ws.exception()}")
     return ws
@@ -95,8 +93,6 @@ async def process_request(data):
             return await presentation_handler.list_scene_versions(data)
         elif method == "DeletePresentation":
             return await presentation_handler.delete_presentation(data)
-        elif method == "PurgePresentations":
-            return await presentation_handler.purge_presentations(data)
         elif method == "ListFolders":
             return await presentation_handler.list_folders(data)
         elif method == "CreateFolder":

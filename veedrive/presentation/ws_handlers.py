@@ -1,4 +1,6 @@
+from .. import config
 from ..utils import jsonrpc
+from ..utils.exceptions import CodeException
 from . import db_manager
 
 
@@ -14,6 +16,8 @@ async def get_presentation(data):
     presentation = await (await db_manager.get_db()).get_presentation(
         presentation_id=data["params"]["id"]
     )
+    if not presentation:
+        raise CodeException(config.PRESENTATION_NOT_FOUND, "Presentation not found")
     return jsonrpc.prepare_response(data, presentation)
 
 
@@ -62,10 +66,14 @@ async def save_presentation(data):
     :rtype: dict
     """
     presentation_data = data["params"]
-    inserted_id: str = await (await db_manager.get_db()).save_presentation_to_storage(
-        presentation_data
-    )
-    return jsonrpc.prepare_response(data, "ok")
+    try:
+        await (await db_manager.get_db()).save_presentation_to_storage(
+            presentation_data
+        )
+        return jsonrpc.prepare_response(data, "ok")
+
+    except Exception as e:
+        return jsonrpc.prepare_error_code(data, e)
 
 
 async def delete_presentation(data):
@@ -78,11 +86,6 @@ async def delete_presentation(data):
     """
     await (await db_manager.get_db()).delete_presentation(data["params"]["id"])
     return jsonrpc.prepare_response(data, 0)
-
-
-async def purge_presentations(data):
-    await (await db_manager.get_db()).purge_presentations()
-    return jsonrpc.prepare_response(data, "OK")
 
 
 async def create_folder(data):

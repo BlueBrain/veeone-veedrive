@@ -43,9 +43,7 @@ async def handle_healthcheck(request):
                             await db_manager.get_db()
                         ).list_presentations()
                         folder_list = await (await db_manager.get_db()).list_folders()
-                        db_operational = (
-                            True if presentation_list or folder_list else False
-                        )
+                        db_operational = bool(presentation_list or folder_list)
                         response = {
                             "fs_ok": fs_operational,
                             "db_ok": db_operational,
@@ -53,7 +51,9 @@ async def handle_healthcheck(request):
                         await ws.send_str(jsonrpc.prepare_response(data, response))
                 except Exception as e:
                     await ws.send_str(
-                        jsonrpc.prepare_error(data, 13, "Issue while performing health check: " + str(e))
+                        jsonrpc.prepare_error(
+                            data, 13, "Issue while performing health check: " + str(e)
+                        )
                     )
         elif msg.type == aiohttp.WSMsgType.ERROR:
             logging.error(f"ws connection closed with exception {ws.exception()}")
