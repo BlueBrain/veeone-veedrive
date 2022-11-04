@@ -1,5 +1,7 @@
+from .. import config
 from ..utils import jsonrpc
 from . import db_manager
+from ..utils.exceptions import CodeException
 
 
 async def get_presentation(data):
@@ -14,6 +16,8 @@ async def get_presentation(data):
     presentation = await (await db_manager.get_db()).get_presentation(
         presentation_id=data["params"]["id"]
     )
+    if not presentation:
+        raise CodeException(config.PRESENTATION_NOT_FOUND, "Presentation not found")
     return jsonrpc.prepare_response(data, presentation)
 
 
