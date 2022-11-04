@@ -67,6 +67,11 @@ class PgConnector(DBInterface):
 
     async def save_presentation_to_storage(self, presentation_data: dict):
         existing_presentation = await self.get_presentation(presentation_data["id"])
+        try:
+            presentation_folder = presentation_data["folder"]
+        except KeyError:
+            presentation_folder = None
+
         if existing_presentation:
             print("existing with same ID", flush=True)
             await self._archive_presentation(existing_presentation)
@@ -75,13 +80,13 @@ class PgConnector(DBInterface):
         if not existing_presentation:
             existing_presentation_with_same_name = await self.get_presentation(
                 presentation_name=presentation_data["name"],
-                presentation_folder=presentation_data["folder"],
+                presentation_folder=presentation_folder,
             )
             if existing_presentation_with_same_name:
                 print("existing with different ID and same name", flush=True)
                 raise CodeException(
                     10,
-                    f'{presentation_data["name"]} already exists in folder: {presentation_data["folder"]}',
+                    f'{presentation_data["name"]} already exists in folder: {presentation_folder}',
                 )
 
         sql_string = f"INSERT INTO presentations (data) VALUES ('{json.dumps(presentation_data)}') RETURNING id;"
@@ -89,10 +94,6 @@ class PgConnector(DBInterface):
 
     async def delete_presentation(self, presentation_id: str):
         sql_string = f"DELETE from presentations WHERE data ::jsonb ->> 'id'  =  '{presentation_id}' ;"
-        return await self.conn.execute(sql_string)
-
-    async def purge_presentations(self):
-        sql_string = f"DELETE from presentations;"
         return await self.conn.execute(sql_string)
 
     async def create_folder(self, folder_name: str):
