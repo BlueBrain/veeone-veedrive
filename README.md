@@ -73,3 +73,7 @@ $ VEEDRIVE_IMAAGE_TAG=0.2.0 VEEDRIVE_DB_PASSWORD=db_password make openstack-up
 if you want to change MEDIA_PATH you need to remove a previously created volume with:
 `docker volume rm media_volume`
 
+
+# Funding & Acknowledgment
+
+The development of this software was supported by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government's ETH Board of the Swiss Federal Institutes of Technology.
